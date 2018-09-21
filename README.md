@@ -8,9 +8,9 @@ DUE: 9/21
 * Write out Mumby into code
 DUE: 9/28
 
-* Reproduce Mumby results
+* Reproduce Mumby results DUE: 10/5
   * gain understanding of sensitivity to certain parameters
-DUE: 10/5
+
 
 * Write spatial model into jupyter notebook
 DUE: 10/12
