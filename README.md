@@ -2,11 +2,12 @@
 
 ## Todo and Timeline
 
-* Initiate this git repo
-DUE: 9/21
+~~* Initiate this git repo
+DUE: 9/21~~
 
 * Write out Mumby into code
 DUE: 9/28
+
 
 * Reproduce Mumby results DUE: 10/5
   * gain understanding of sensitivity to certain parameters
