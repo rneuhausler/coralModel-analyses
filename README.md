@@ -7,21 +7,7 @@
 ~~* Initiate this git repo
 DUE: 9/21~~
 
-* Write out Mumby into code
-DUE: 9/28
+*
 
-
-* Reproduce Mumby results DUE: 10/12
-  * gain understanding of sensitivity to certain parameters
-
-
-* Write spatial model into jupyter notebook
-DUE: 10/19
-
-* Add spatial variability to Mumby model
-DUE: 10/24
-
-* Add fish to spatial model
-DUE: 10/31
-
+$\frac{dM}{dt} = aMC - \frac{gM}{M+T} + \gamma MT$
 
