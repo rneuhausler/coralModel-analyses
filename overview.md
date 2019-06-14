@@ -1,0 +1,133 @@
+Spatiotemporal Coral Model Overview
+================
+Rosanna Neuhausler |
+June 14th, 2019
+
+## Issues with running the model
+
+Error message when compiling in virtual environment creaded via
+
+``` r
+conda create -n coral3 python=x.x anaconda
+```
+
+The message recieved:
+
+``` r
+error: use of undeclared identifier 'PyString_AsString'
+    char* str = PyString_AsString(thisAttr);
+```
+
+Which leads to:
+
+``` r
+Traceback (most recent call last):
+  File "nofish.py", line 1, in <module>
+    import sparpy
+ImportError: No module named sparpy
+```
+
+## Abstract
+
+Ecological phase shifts, from coral reefs to macroalgae dominated
+states, have drastically changed tropical coastal zones over the past 60
+years. However, these shifts are not always immediate - macroalgae are
+generally present even when coral colonies are dominant, with algal
+distribution regulated by herbivorous fish. Current efforts in
+projecting coral-algal phase shifts utilize temporal mechanistic models
+and spatiotemporal statistical models, both of which fail to capture
+metastability between multiple steady states given a lack of spatial
+information and spatiotemporal resolution, respectively. To address
+these concerns, we build on these models to account for spatial
+variations and stochasticity, in combination with individual organisms
+and their mechanisms. Our model can project the percent cover and
+spatial distributions of coral, macroalgae, and algae turf as a function
+of three reef resilience indicators - herbivorous grazers, water
+quality, and coral demographics. Grazers are included using an
+individual-based kinetic model and interact with neighbouring benthic
+assemblages. Water quality and coral demographics are input parameters
+that can vary over time, allowing our model to be run for temporally
+changing scenarios that can be adjusted for different reefs.
+
+**Key Words** : Coral Reef Competition, Spatiotemporal Modeling, Benthic
+Coverage
+
+## Introduction
+
+Coral Reef Systems are currently threatened from temperature rise. The
+main issue is not whether coral bleach, but it is their death and
+inability to grow back as a result of different organisms taking their
+space. We look to capture the outcomes of spatial competition through a
+spatiotemporal toy model.
+
+## Coral Reef Competition and Alternate Stable States
+
+Certain coral secrete calcium carbonate, which over time develops a
+coral reef. Coral reefs, when located in shallow waters, are considered
+optimal locations for benthic organisms, such as macroalgae/algae turf
+(not to be confused with the microalgae symbiont), to grow upon due to
+sunlight availability. Coral and algae together, through their
+facilitation of housing and food, attract a wide variety of other
+species, resulting in “rainforests of the ocean” (Swart 2013). There are
+various dynamics within reefs systems, including constant competition
+for reef space. While this includes coral v. coral competition for
+space, a lot of research and political economic focus is placed on the
+competition between coral and macroalgae/algae turf, due to the fact
+that coral are needed to build and sustain the reef. There are various
+factors that are considered to either boost or impede the growth of
+macroalgae and others known to harm coral, changing the odds for which
+competitor (coral or algae), dominates the reef. These are shown in
+figure 1.
+
+**Coral System Image here**
+
+Unique to complex systems is the idea of regime shifts - a change from
+one stable state to another often due to an external force pushing the
+system past a specific threshold. This concept is visualized in the
+figure to the right \[insert figure of curve with ball\]. This idea can
+be applied to various systems, such as the shift from a forest to
+grassland. This phenomena is often discussed in dichotomy, with the
+system either being in one state or the other. However, In our study we
+look to explore the transition between these states, specifically
+metastability and reefs inclined to frequent switching.
+
+We focus our efforts based on data gathered from the french polynesia
+
+  - \(\frac{dM}{dt} = aMC - \frac{gM}{M+T} + \gamma MT\)
+  - \(\frac{dC}{dt} = rTC - dC - aMC\)
+  - \(\frac{dT}{dt} = \frac{gM}{M+T} - \gamma MT - rTC + dC\)
+
+<!-- end list -->
+
+``` r
+output <- mumby_eqs(g = .2,  dt = .1)
+mumby_plot(output, title="Grazing = .2")
+```
+
+![](overview_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+and as we have shown, reef competition has been seen to cause
+oscillating competitive advantages, which the mumby et al. equations do
+not present on their own. We hypothesize that this fluctuating behaviour
+can be captured in a mathematical model if the spatial complexity,
+specifically neighborhood influences, is incorporated into the model.
+Inspired by current data gathering efforts, we set up our model.
+
+## Methods
+
+We use a python front-end, C++ back-end package, Aboria, to
+
+The model is experimented with on various levels, intending to replicate
+the effects of numbers of organisms in the reef improving that organisms
+resiliency.
+
+## Results
+
+We ran our model at various parameter set ups for 100 times each, the
+results from some of these run can be seen in Figure *.* below. As
+
+## Discussion
+
+Incorporating neighborhood knowledge into our model has allowed for
+
+## Bibliography
