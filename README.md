@@ -12,10 +12,10 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * algal turf
 * macroalgae
 
-The model updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions.
+The model updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
 
 
-### Model Structure
+### Model Structure - Inputs
 
 Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`.
 
@@ -70,7 +70,6 @@ for s in range(0,NumberOfSimulations):
             Moorea.append(node)                                                  # <-- append()
             count = count + 1
     Moorea.generateGraph()                                                       # <-- generateGraph()
-    #NumberOfNodes = count
     
 #Run model 
     for n in range(0,NumberOfRuns):
@@ -84,15 +83,48 @@ for s in range(0,NumberOfSimulations):
     .
 ```
 
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()` based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
 
 
 
 
 
+the mechanics behind `roll()` are as follows:
+
+```python
+
+    def roll(self, r, d, a, g, y, dt):
+        for i, val in enumerate(self.nodes):      
+            U = random.uniform(0,1)
+            totalDensity = self.nodes[i].density.sum()
+            coralDensity = self.nodes[i].density[0]/totalDensity
+            turfDensity = self.nodes[i].density[1]/totalDensity
+            algaeDensity = self.nodes[i].density[2]/totalDensity
+
+            if self.nodes[i].type == 0:   
+                if U <  (d * (1+coralDensity)) * dt:
+                    self.nodes[i].type = 1
+                    self.inform(initial = 0, final = 1, nodeID = i)
+                elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
+                          d * (1+coralDensity)) * dt:
+                    self.nodes[i].type = 2
+                    self.inform(initial = 0, final = 2, nodeID = i)
+
+            elif self.nodes[i].type == 1:
+                if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
+                    self.nodes[i].type = 0
+                    self.inform(initial = 1, final = 0, nodeID = i)
+                    .
+                    .
+                    .
+      
+            elif self.nodes[i].type == 2:
+                    .
+                    .
+                    .
+```
 
 
-
-calculated using Mumby et al. (2014)'s reef competion ODE's, described in the model section below.
 
 
 
