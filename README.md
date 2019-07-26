@@ -13,6 +13,13 @@
 * [x] Code up model in python
 * [x] Generate outputs
 * [ ] Implement TDA
-* [ ] LaTeX Write-up (Due by: 8/1/2019 )
+* [ ] LaTeX Write-up
+
+
+# coralModel
+
+*Name subject to change ${html`*`}asterisk*`
+
+
 
 
