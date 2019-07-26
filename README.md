@@ -18,7 +18,7 @@
 
 # coralModel*
 
-* official name tbd
+*official name tbd
 
 
 
