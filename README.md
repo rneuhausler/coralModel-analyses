@@ -25,7 +25,7 @@ An example of an 8X8 node reef's composition initially and after 100 runs (updat
 ![](images/exampleOutput/timeseries.png)
 
 
-These plots were generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
+These plots were generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts". The first file is an example script of how to use the classes to create your own reef model.
 
 
 ### Model Structure
@@ -57,14 +57,11 @@ class Reef():
      .
 ```
 
+#### Creating the Reef
+
 The user establishes instances of class `Organism()` with a benthic type (0=coral, 1=turf, 2=macroalgae), a coordinate location, and an ID number. These instances can then be appended to an instance of class `Reef()` as a node attribute, using `append()`. Once all the nodes are appended, the user can use `generateGraph()` to establish which instances of class `Organism()` are considered as neighbors of oneanother (based on a given distance threshold and the previously defined coordinate location). 
 
-
-Once the graph is generated, the user can run a timestep of the model through `roll()`. This function takes in the weights of the parameters shown in mumby et. al's ODE's and a dt.
-
-This repository contains the files `coralModel.py`, and `coralModelTest.py`.
-
-The first file defines the classes, as shown above, used to generate the spatiotemporal reef model. The second is an example script of how to use the classes to create your own reef model. It's creation and use of an 8x8 reef with randomly assigned types for the initial nodes is shown below:
+The creation and use of an 8x8 reef with randomly assigned types for the initial nodes is shown below:
 
 ```python
     .
@@ -80,7 +77,17 @@ for s in range(0,NumberOfSimulations):
             Moorea.append(node)                                                  # <-- append()
             count = count + 1
     Moorea.generateGraph()                                                       # <-- generateGraph()
+    .
+    .    
+    
+```
 
+
+#### Reef Update
+
+Once the graph is generated, the user can run a timestep of the model through `roll()`.
+
+```
     for n in range(0,NumberOfRuns):
         for i,val in enumerate(Moorea.nodes):
             types[n,i,s] = Moorea.nodes[i].type
@@ -97,7 +104,7 @@ for s in range(0,NumberOfSimulations):
 ![](images/mumbyEquations.png)
 
 
-the mechanics behind `roll()` are as follows:
+The mechanics behind `roll()` are as follows:
 
 ```python
 
@@ -133,14 +140,15 @@ the mechanics behind `roll()` are as follows:
 ### Outputs
 
 Currently, `coralModelTest.py` plots 
+
  1. The initial and final spatial configurations of the instance `Reef()`, side-by-side
  2. The timeseries of each type's count for the 100 runs
  3. The timeseries for 100 simulations averaged
 
-However, throughout the code, the spatial distribution of the types at each timestep of a simulation is stored and can therefore also be save and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
+However, throughout the code, the spatial distribution of the types at each timestep of a simulation is stored and can therefore also be saved and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
 
 
-### Running `coralModelTest.py`
+### Running coralModelTest.py
 
 To run the example script, follow the following instructions:
 
