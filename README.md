@@ -22,6 +22,7 @@ The model consists of various nodes that is assigned one of these types. The nod
 An example of an 8X8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below:
 
 ![](images/exampleOutput/grid.png)
+{:.center}
 ![](images/exampleOutput/timeseries.png)
 
 
