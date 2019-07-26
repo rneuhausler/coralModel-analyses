@@ -13,13 +13,13 @@ For the purpose of drawing attention to specific parts of the python code throug
 
 coralModel is a stochastic spatiotemporal model representing the spatiotemporal evolution of three competing coral reef benthic coverages:
 
-* coral
-* algal turf
-* macroalgae
+* Coral
+* Algal turf
+* Macroalgae
 
 The model consists of various nodes that is assigned one of these types. The node type then updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
 
-An example of an 8X8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below:
+An example of an 8x8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below (0=Coral, 1=Turf, 2=Macroalgae):
 
 ![](images/exampleOutput/grid.png)
 ![](images/exampleOutput/timeseries.png)
@@ -170,7 +170,7 @@ python3.6 coralModelTest.py
 
 It usually takes a few seconds to run. You will know it's complete when a figure showing the inital and final grid pop up.
 
-You can also simply run this script using any of your favorite python IDEs (Integrated Development Environment)
+You can also simply run this script using any of your favorite python IDEs (Integrated Development Environment).
 
 
 
