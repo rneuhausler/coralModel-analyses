@@ -24,8 +24,7 @@ The model consists of various nodes that is assigned one of these types. The nod
 An example of an 8X8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below:
 
 ![](images/exampleOutput/grid.png)
-![](images/exampleOutput/timeseries.png)
-{: refdef}
+![](images/exampleOutput/timeseries.png){: refdef}
 
 
 This plot was generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
@@ -97,8 +96,7 @@ for s in range(0,NumberOfSimulations):
 
 `roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
 
-![](images/mumbyEquations.png)
-{: refdef}
+![](images/mumbyEquations.png){: refdef}
 
 
 the mechanics behind `roll()` are as follows:
