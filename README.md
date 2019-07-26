@@ -16,9 +16,9 @@
 * [ ] LaTeX Write-up
 
 
-# coralModel"*"
+# coralModel*
 
-"*" official name tbd
+* official name tbd
 
 
 
