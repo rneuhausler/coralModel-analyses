@@ -25,7 +25,7 @@ An example of an 8X8 node reef's composition initially and after 100 runs (updat
 ![](images/exampleOutput/timeseries.png)
 
 
-This plot was generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
+These plots were generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
 
 
 ### Model Structure
