@@ -5,8 +5,8 @@
 
 For the purpose of drawing attention to specific parts of the python code throughout this introduction, I substitute non-focused on parts of the code with:
 ```python
-                   .
-                   .
+     .
+     .
 ```
                 
 ## Overview
@@ -88,8 +88,6 @@ for s in range(0,NumberOfSimulations):
 
 
 
-
-
 the mechanics behind `roll()` are as follows:
 
 ```python
@@ -97,8 +95,11 @@ the mechanics behind `roll()` are as follows:
     def roll(self, r, d, a, g, y, dt):
         for i, val in enumerate(self.nodes):      
             U = random.uniform(0,1)
-                   .
-                   .
+            totalDensity = self.nodes[i].density.sum()
+            coralDensity = self.nodes[i].density[0]/totalDensity
+            turfDensity = self.nodes[i].density[1]/totalDensity
+            algaeDensity = self.nodes[i].density[2]/totalDensity
+            
             if self.nodes[i].type == 0:   
                 if U <  (d * (1+coralDensity)) * dt:
                     self.nodes[i].type = 1
@@ -112,12 +113,21 @@ the mechanics behind `roll()` are as follows:
                 if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
-                    .
-                    .
+    .
+    .
             elif self.nodes[i].type == 2:
-                    .
-                    .
+    .
+    .
 ```
+
+
+### Model Structure - Outputs
+
+Currently, `coralModelTest.py` plots 
+ 1. the initial and final spatial configurations of the instance `Reef()` side-by-side
+ 2.
+ 3.
+
 
 
 
