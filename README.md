@@ -3,7 +3,12 @@
 # coralModel*
 *official name tbd
 
-
+For the purpose of drawing attention to specific parts of the python code throughout this introduction, I substitute non-focused on parts of the code with:
+```python
+                   .
+                   .
+```
+                
 ## Overview
 
 coralModel is a stochastic spatiotemporal model representing the spatiotemporal evolution of three competing coral reef benthic coverages:
@@ -51,15 +56,12 @@ Once the graph is generated, the user can run a timestep of the model through `r
 
 This repository contains the files `coralModel.py`, and `coralModelTest.py`.
 
-The first file defines the classes, as shown above, used to generate the spatiotemporal reef model. The second is an example script of how to use the classes to create your own reef model, as shown below:
+The first file defines the classes, as shown above, used to generate the spatiotemporal reef model. The second is an example script of how to use the classes to create your own reef model. It's creation and use of an 8x8 reef with randomly assigned types for the initial nodes is shown below:
 
 ```python
     .
     .
 for s in range(0,NumberOfSimulations):
-    
-#Generate square 8x8 reef with randomly assigned types
-#0 = Coral, 1 = Turf, 2 = Algae
     Moorea = Reef()                                                              # <-- Reef()
     count = 0
     for i in range(0,length):
@@ -70,8 +72,7 @@ for s in range(0,NumberOfSimulations):
             Moorea.append(node)                                                  # <-- append()
             count = count + 1
     Moorea.generateGraph()                                                       # <-- generateGraph()
-    
-#Run model 
+
     for n in range(0,NumberOfRuns):
         for i,val in enumerate(Moorea.nodes):
             types[n,i,s] = Moorea.nodes[i].type
@@ -83,7 +84,7 @@ for s in range(0,NumberOfSimulations):
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()` based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
 
 
 
@@ -96,11 +97,8 @@ the mechanics behind `roll()` are as follows:
     def roll(self, r, d, a, g, y, dt):
         for i, val in enumerate(self.nodes):      
             U = random.uniform(0,1)
-            totalDensity = self.nodes[i].density.sum()
-            coralDensity = self.nodes[i].density[0]/totalDensity
-            turfDensity = self.nodes[i].density[1]/totalDensity
-            algaeDensity = self.nodes[i].density[2]/totalDensity
-
+                   .
+                   .
             if self.nodes[i].type == 0:   
                 if U <  (d * (1+coralDensity)) * dt:
                     self.nodes[i].type = 1
@@ -116,10 +114,7 @@ the mechanics behind `roll()` are as follows:
                     self.inform(initial = 1, final = 0, nodeID = i)
                     .
                     .
-                    .
-      
             elif self.nodes[i].type == 2:
-                    .
                     .
                     .
 ```
