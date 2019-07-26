@@ -18,7 +18,7 @@
 
 # coralModel*
 
-*official name tbd
+<div style="text-align: right"> *official name tbd </div>
 
 
 
