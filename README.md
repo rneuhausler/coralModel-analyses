@@ -3,12 +3,13 @@
 # coralModel*
 *official name tbd
 
+----
 For the purpose of drawing attention to specific parts of the python code throughout this introduction, I substitute non-focused on parts of the code with:
 ```python
      .
      .
 ```
-                
+----              
 ## Overview
 
 coralModel is a stochastic spatiotemporal model representing the spatiotemporal evolution of three competing coral reef benthic coverages:
