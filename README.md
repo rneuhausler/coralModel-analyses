@@ -16,10 +16,9 @@
 * [ ] LaTeX Write-up
 
 
-# coralModel
+# coralModel`*`
 
-*Name subject to change ${html`*`}asterisk*`
-
+`*` official name tbd
 
 
 
