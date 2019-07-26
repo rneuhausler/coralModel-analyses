@@ -20,9 +20,10 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 
 The model consists of various nodes that is assigned one of these types. The node type then updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
 
-An example of an 8X8 node reef and it's composition initially and after 100 runs (updates) is shown below:
+An example of an 8X8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below:
 
-![](images/sankt_gallen.jpg)
+![](images/exampleOutput/grid.png)
+![](images/exampleOutput/timeseries.png)
 
 This plot was generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
 
@@ -93,7 +94,7 @@ for s in range(0,NumberOfSimulations):
 
 `roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
 
-
+![](images/mumbyEquations.png)
 
 the mechanics behind `roll()` are as follows:
 
@@ -131,14 +132,11 @@ the mechanics behind `roll()` are as follows:
 ### Outputs
 
 Currently, `coralModelTest.py` plots 
- 1. the initial and final spatial configurations of the instance `Reef()` side-by-side
- 2.
- 3.
+ 1. The initial and final spatial configurations of the instance `Reef()`, side-by-side
+ 2. The timeseries of each type's count for the 100 runs
+ 3. The timeseries for 100 simulations averaged
 
-
-
-
-
+However, throughout the code, the spatial distribution of the types at each timestep of a simulation is stored and can therefore also be save and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
 
 
 ### Running `coralModelTest.py`
@@ -153,13 +151,13 @@ cd Documents/models
 ```
 3. clone the repository and `cd` into the scripts file
 ```
-cd coralModel/scripts
 git clone https://github.com/rneuhausler/coralModel
+cd coralModel/scripts
 ```
 4. Run the model
 ```
 python3.6 coralModelTest.py
-``
+```
 
 It usually takes a few seconds to run. You will know it's complete when a figure showing the inital and final grid pop up.
 
