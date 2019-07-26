@@ -60,16 +60,16 @@ for s in range(0,NumberOfSimulations):
     
 #Generate square 8x8 reef with randomly assigned types
 #0 = Coral, 1 = Turf, 2 = Algae
-    Moorea = Reef()
+    Moorea = Reef()                                                              # <-- Reef()
     count = 0
     for i in range(0,length):
         for j in range(0, width):
             U = np.random.choice([0,1,2],
                                  p=[coralPercent, turfPercent, algaePercent])
-            node = Organism(type=U, location=[i,j], ID=count)
-            Moorea.append(node)                                    ## <--- Organism()
+            node = Organism(type=U, location=[i,j], ID=count)                    # <-- Organism()
+            Moorea.append(node)                                                  # <-- append()
             count = count + 1
-    Moorea.generateGraph()                                         ## <--- generateGraph()
+    Moorea.generateGraph()                                                       # <-- generateGraph()
     #NumberOfNodes = count
     
 #Run model 
@@ -79,7 +79,7 @@ for s in range(0,NumberOfSimulations):
         coralCount[n,s] = np.count_nonzero(types[n,:,s] == 0)
         turfCount[n,s] = np.count_nonzero(types[n,:,s] == 1)
         algaeCount[n,s] = np.count_nonzero(types[n,:,s] == 2)
-        Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)                ## <--- roll()
+        Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)                             # <-- roll()
     .
     .
 ```
