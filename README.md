@@ -18,10 +18,16 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * algal turf
 * macroalgae
 
-The model updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
+The model consists of various nodes that is assigned one of these types. The node type then updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
+
+An example of an 8X8 node reef and it's composition initially and after 100 runs (updates) is shown below:
+
+![](images/sankt_gallen.jpg)
+
+This plot was generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts"
 
 
-### Model Structure - Inputs
+### Model Structure
 
 Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`.
 
@@ -122,7 +128,7 @@ the mechanics behind `roll()` are as follows:
 ```
 
 
-### Model Structure - Outputs
+### Outputs
 
 Currently, `coralModelTest.py` plots 
  1. the initial and final spatial configurations of the instance `Reef()` side-by-side
@@ -132,6 +138,32 @@ Currently, `coralModelTest.py` plots
 
 
 
+
+
+
+### Running `coralModelTest.py`
+
+To run the example script, follow the following instructions:
+
+1. Make sure you have python 3.6 installed
+2. Open your terminal and `cd` to the location where you wish to store this repository
+e.g.
+```
+cd Documents/models
+```
+3. clone the repository and `cd` into the scripts file
+```
+cd coralModel/scripts
+git clone https://github.com/rneuhausler/coralModel
+```
+4. Run the model
+```
+python3.6 coralModelTest.py
+``
+
+It usually takes a few seconds to run. You will know it's complete when a figure showing the inital and final grid pop up.
+
+You can also simply run this script using any of your favorite python IDEs (Integrated Development Environment)
 
 
 
