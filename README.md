@@ -17,20 +17,20 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * Algal turf
 * Macroalgae
 
-The model consists of various nodes that is assigned one of these types. The node type then updates stochastically through probabilities weighted by neighboring benthic coverages and overall reef conditions defined through input parameters.
+The model consists of various nodes, each of which is assigned one of these types of benthic coverage. The node's type then updates stochastically through probabilities weighted by neighboring types and overall reef conditions defined through input parameters.
 
-An example of an 8x8 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time, are shown below (0=Coral, 1=Turf, 2=Macroalgae):
+Below is an example of an 10x10 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time (0=Coral, 1=Turf, 2=Macroalgae).:
 
 ![](images/exampleOutput/grid.png)
 ![](images/exampleOutput/timeseries.png)
 
 
-These plots were generated running the file `coralModelTest.py`, which uses classes defined in `coralModel.py`. Both of these files are found in this respository under "scripts". The first file is an example script of how to use the classes to create your own reef model.
+These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this respository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
 
 
 ### Model Structure
 
-Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`.
+Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`. Their attributed are defined in the `coralModel.py` as follows:
 
 ```python
 class Organism():  
@@ -59,9 +59,9 @@ class Reef():
 
 #### Creating the Reef
 
-The user establishes instances of class `Organism()` with a benthic type (0=coral, 1=turf, 2=macroalgae), a coordinate location, and an ID number. These instances can then be appended to an instance of class `Reef()` as a node attribute, using `append()`. Once all the nodes are appended, the user can use `generateGraph()` to establish which instances of class `Organism()` are considered as neighbors of oneanother (based on a given distance threshold and the previously defined coordinate location). 
+To create a reef model, the user establishes multiple instances of class `Organism()` with a benthic type (0=coral, 1=turf, 2=macroalgae), a coordinate location, and an ID number. These instances can then be appended to an instance of class `Reef()` as a node attribute, using `append()`. Once all the nodes are appended, the user can run `generateGraph()` to establish which instances of class `Organism()` are considered as neighbors of oneanother (based on a given distance threshold and the previously defined coordinate location). 
 
-The creation and use of an 8x8 reef with randomly assigned types for the initial nodes is shown below:
+An example of this process, the creation of an 10x10 reef with randomly assigned types for the initial nodes, is shown below:
 
 ```python
     .
@@ -85,7 +85,7 @@ for s in range(0,NumberOfSimulations):
 
 #### Reef Update
 
-Once the graph is generated, the user can run a timestep of the model through `roll()`.
+Once the graph is generated, the user can run a timestep of the model, i.e. a stochastic update of node types, through `roll()`.
 
 ```
     for n in range(0,NumberOfRuns):
@@ -99,12 +99,12 @@ Once the graph is generated, the user can run a timestep of the model through `r
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If this number falls within the bounds of the weighted probability, the node switches to a different type. They weighing is inspired by Mumby et al. (2014)'s reef competion ODE's, shown below:
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2014)'s reef competion ODE's, shown below:
 
 ![](images/mumbyEquations.png)
 
 
-The mechanics behind `roll()` are as follows:
+These equations are discretized and incorporated into `roll()` as follows:
 
 ```python
 
@@ -145,12 +145,11 @@ Currently, `coralModelTest.py` plots
  2. The timeseries of each type's count for the 100 runs
  3. The timeseries for 100 simulations averaged
 
-However, throughout the code, the spatial distribution of the types at each timestep of a simulation is stored and can therefore also be saved and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
-
+However, within `coralModelTest.py`, the spatial distribution of the type at each timestep of a simulation is stored and can therefore also be saved and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
 
 ### Running coralModelTest.py
 
-To run the example script, follow the following instructions:
+To run the `coralModelTest.py`, follow the following instructions:
 
 1. Make sure you have python 3.6 installed
 2. Open your terminal and `cd` to the location where you wish to store this repository
@@ -170,7 +169,7 @@ python3.6 coralModelTest.py
 
 It usually takes a few seconds to run. You will know it's complete when a figure showing the inital and final grid pop up.
 
-You can also simply run this script using any of your favorite python IDEs (Integrated Development Environment).
+You can also simply run this script using any of your favorite python IDEs.
 
 
 
