@@ -103,8 +103,15 @@ Once the graph is generated, the user can run a timestep of the model, i.e. a st
 
 ![](images/mumbyEquations.png)
 
+From the equations above, we extract a set of 5 different reactions that are possible to occur.
+We take the equations above and write out the interactions as follows:
 
-These equations are discretized and incorporated into `roll()` as follows:
+![](images/mumbySimplified.png)
+
+These interactions emphasize the influence of the parameters presented in the mumby equations and their influence from changing a spot on the reef from being one type, to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral". For our coralModel we also include the influence of each nodes neighborhood. Whereas the mumby et al. equations consider the global population of coral of the system, we focus on the local composition around each node with the assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` of the instances from class `Organism()`. This value is initially measured with  `generateGraph()` and updated throughout the simulation with `inform()` and `update()`, written in `coralModel.py` but not shown in this introduction.
+
+
+The inclusion of the denisity of each type within each nodes neighborhood can be seen in the code below showing how the function `roll()` multiplies each reaction rate with the density of each type in the neighborhood.
 
 ```python
 
