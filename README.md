@@ -21,11 +21,10 @@ The model consists of various nodes, each of which is assigned one of these type
 
 Below is an example of an 10x10 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time (0=Coral, 1=Turf, 2=Macroalgae).:
 
-![](images/exampleOutput/grid.png)
-![](images/exampleOutput/timeseries.png)
+![](images/exampleOutput/combined.png)
 
 
-These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this respository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
+These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this repository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
 
 
 ### Model Structure
@@ -99,18 +98,17 @@ Once the graph is generated, the user can run a timestep of the model, i.e. a st
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2014)'s reef competion ODE's, shown below:
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2014)'s reef competition ODE's, shown below:
 
 ![](images/mumbyEquations.png)
 
 From the equations above, we extract a set of 5 different reactions that are possible to occur:
 
-![](images/mumbySimplified.png)
+![](images/mumbyAdjusted.png)
 
-These interactions emphasize the influence of the parameters presented in the mumby equations and their influence from changing a spot on the reef from being one type to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral. For our coralModel we also include the influence of each node's neighborhood. Whereas the mumby et al. equations consider the global population of coral of the system, we focus on the local composition around each node with assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` from class `Organism()`. This value is initially measured with `generateGraph()` and then updated throughout the simulation with `inform()` and `update()`, which are not shown in this introduction but can be found in `coralModel.py`.
+These reactions emphasize the influence the parameters, pulled from the mumby equations, and species density around each node have on changing a spot on the reef from being one type to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral and density of the two species. Whereas the mumby et al. equations consider the *global* population of coral of the system, we focus on the *local* composition around each node with assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` from class `Organism()`. This value is initially measured with `generateGraph()` and then updated throughout the simulation with `inform()` and `update()`, which are not shown in this introduction but can be found in `coralModel.py`.
 
-
-The inclusion of the denisity of each type within each nodes neighborhood can be seen in the code below showing how the function `roll()` multiplies each reaction rate with the density of each type in the neighborhood.
+The inclusion of the local type density can be seen in the code below, showing how the function `roll()` multiplies each reaction parameter with the density of specific types in the node's neighborhood in calculating the probability of type switching.
 
 ```python
 
@@ -123,7 +121,7 @@ The inclusion of the denisity of each type within each nodes neighborhood can be
             algaeDensity = self.nodes[i].density[2]/totalDensity
             
             if self.nodes[i].type == 0:   
-                if U <  (d * (1+coralDensity)) * dt:
+                if U <  (d * (1+coralDensity)) * dt:                    # <-- reaction parameter * density
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
                 elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
@@ -173,7 +171,7 @@ cd coralModel/scripts
 python3.6 coralModelTest.py
 ```
 
-It usually takes a few seconds to run. You will know it's complete when a figure showing the inital and final grid pop up.
+It usually takes a few seconds to run. You will know it's complete when a figure showing the initial and final grid pop up.
 
 You can also simply run this script using any of your favorite python IDEs.
 
