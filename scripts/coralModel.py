@@ -42,7 +42,7 @@ class Reef():
                     self.nodes[i].density[0] += 1
                 elif self.nodes[n].type == 1:
                     self.nodes[i].density[1] += 1
-                else:
+                elif self.nodes[n].type == 2:
                     self.nodes[i].density[2] += 1
                     
     def generateGraph(self, threshold=1.5):
@@ -78,26 +78,36 @@ class Reef():
             algaeDensity = self.nodes[i].density[2]/totalDensity
 
             if self.nodes[i].type == 0:   
+                
                 if U <  (d * (1+coralDensity)) * dt:
+                    
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
+                    
                 elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
                           d * (1+coralDensity)) * dt:
+                    
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 1:
+                
                 if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
+                    
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
+                    
                 elif U > 1 - (y * (1+algaeDensity) * (1+turfDensity) + 
                               r * (1+coralDensity) * (1+turfDensity)) * dt:
+                    
                     self.nodes[i].type = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 2:
+                
                 if U < g * (1+(algaeDensity/(algaeDensity + turfDensity))) * dt:
+                    
                     self.nodes[i].type = 1
-                    self.inform(initial = 0, final = 1, nodeID = i)
+                    self.inform(initial = 2, final = 1, nodeID = i)
 
         self.update()
