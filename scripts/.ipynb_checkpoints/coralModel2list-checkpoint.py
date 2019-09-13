@@ -5,7 +5,7 @@ import math
 
 class Organism():
     
-    def __init__(self, ID, type, location):
+    def __init__(self, ID, location, type):
         self.ID = ID
         self.type = type
         self.density = np.zeros(3)
@@ -38,9 +38,9 @@ class Reef():
     def initiateDensity(self):
         for i,val in enumerate(self.nodes):
             for n in self.graph[i]:
-                if self.nodes[n].type == 0:
+                if self.nodes[n].type[0,0] == 0:
                     self.nodes[i].density[0] += 1
-                elif self.nodes[n].type == 1:
+                elif self.nodes[n].type[0,0] == 1:
                     self.nodes[i].density[1] += 1
                 else:
                     self.nodes[i].density[2] += 1
@@ -69,7 +69,7 @@ class Reef():
             self.nodes[key].density += self.updates[key]
         self.updates = {}
         
-    def roll(self, r, d, a, g, y, dt):
+    def roll(self, r, d, a, g, y, dt, t=0, s=0):
         for i, val in enumerate(self.nodes):      
             U = random.uniform(0,1)
             totalDensity = self.nodes[i].density.sum()
@@ -77,32 +77,26 @@ class Reef():
             turfDensity = self.nodes[i].density[1]/totalDensity
             algaeDensity = self.nodes[i].density[2]/totalDensity
 
-            if self.nodes[i].type == 0:   
+            if self.nodes[i].type[t,s] == 0:   
                 if U <  d * dt:
-                    self.nodes[i].type = 1
+                    self.nodes[i].type[t+1,s] = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
                 elif U < (a * (1+algaeDensity) + 
                           d * dt):
-                    self.nodes[i].type = 2
+                    self.nodes[i].type[t+1,s] = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
 
-            elif self.nodes[i].type == 1:
+            elif self.nodes[i].type[t,s] == 1:
                 if U > 1 - (r * (1+coralDensity)) * dt:
-                    self.nodes[i].type = 0
+                    self.nodes[i].type[t+1,s] = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
                 elif U > 1 - (y * (1+algaeDensity) + 
                               r * (1+coralDensity)) * dt:
-                    self.nodes[i].type = 2
+                    self.nodes[i].type[t+1,s] = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
 
-            elif self.nodes[i].type == 2:
+            elif self.nodes[i].type[t,s] == 2:
                 if U < g * (1+(algaeDensity + turfDensity)) * dt:
-                    self.nodes[i].type = 1
+                    self.nodes[i].type[t+1,s] = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
-            #print('node' + str(self.nodes[i].type))
-            #print('algae density' + str(algaeDensity))
-            #print('coral density' + str(coralDensity))
-            #print('turf density' + str(turfDensity))
-
-
         self.update()
