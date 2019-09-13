@@ -1,6 +1,5 @@
 
-# coralModel*
-*official name tbd
+# coralModel
 
 ----
 For the purpose of drawing attention to specific parts of the python code throughout this introduction, I substitute non-focused on parts of the code with:
@@ -98,7 +97,7 @@ Once the graph is generated, the user can run a timestep of the model, i.e. a st
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2014)'s reef competition ODE's, shown below:
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
 
 ![](images/mumbyEquations.png)
 
@@ -179,7 +178,7 @@ You can also simply run this script using any of your favorite python IDEs.
 
 
 
-
+[1] Mumby, P. J., Hastings, A., & Edwards, H. J. (2007). Thresholds and the resilience of Caribbean coral reefs. Nature, 450(7166), 98–101. https://doi.org/10.1038/nature06252
 
 
 
