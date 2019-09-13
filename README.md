@@ -175,8 +175,7 @@ It usually takes a few seconds to run. You will know it's complete when a figure
 You can also simply run this script using any of your favorite python IDEs.
 
 
-
-
+### References
 
 [1] Mumby, P. J., Hastings, A., & Edwards, H. J. (2007). Thresholds and the resilience of Caribbean coral reefs. Nature, 450(7166), 98–101. https://doi.org/10.1038/nature06252
 
