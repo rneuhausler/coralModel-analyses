@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as clt
+import PIL
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 
 ## Plotting Tools
@@ -53,9 +54,87 @@ def timeSeries(x, x1, x2, x3, legend1='Coral', legend2='Turf', legend3='Algae'):
 
 ## TDA Tools
 
+def binaryizer(df):
+    with np.errstate(divide='ignore',invalid='ignore'):
+        df = np.nan_to_num(df/df)
+    return(df)
+    
+def shaper(df, rows):
+    df = np.reshape(df, (-1, rows))
+    return(df)
 
+def finer(df, rows=10, columns=10, scale=3):
+    columnCenter, rowCenter = 0, 0
+    columnCount, rowCount = 0, 0
+    fine = np.zeros((rows*scale,columns*scale))
+    for r in range(0,rows*scale):
+        for c in range(0,columns*scale):            
+            fine[r,c] = df[rowCenter, columnCenter]           
+            columnCount += 1
+            if columnCount == scale:
+                columnCenter += 1
+                columnCount = 0
+        rowCount += 1
+        if rowCount == scale:
+            rowCenter += 1
+            rowCount = 0
+        columnCenter = 0 
+    return(fine)
+
+def tda_prep(df, columns, rows, fineness, refined_grid = True):
+    df = binaryizer(df)
+    dfi = 1-df
     
+    df = shaper(df,rows)
+    dfi = shaper(dfi,rows)
     
+    if refined_grid == True:
+        df = finer(df, rows, columns, scale = fineness)
+        dfi = finer(dfi, rows, columns, scale = fineness)
+    return(df, dfi)  
+
+
+## From SciKit https://ripser.scikit-tda.org/Lower%20Star%20Image%20Filtrations.html
+
+
+from ripser import ripser, lower_star_img
+from persim import plot_diagrams
+from scipy import ndimage
+
+def prep2(df):
+    cells_grey = np.asarray(PIL.Image.fromarray(df).convert('L'))
+    smoothed = ndimage.uniform_filter(cells_grey.astype(np.float64), size=10)
+    smoothed += 0.01 * np.random.randn(*smoothed.shape)
+    return(smoothed)
+
+
+def pointDef(dgm, threshold):
+    idxs = np.arange(dgm.shape[0])
+    idxs = idxs[np.abs(dgm[:, 1] - dgm[:, 0]) > threshold]
+    return(idxs)
+
+def plotPoints(points, df, dgm):
+    X, Y = np.meshgrid(np.arange(df.shape[1]), np.arange(df.shape[0]))
+    X = X.flatten()
+    Y = Y.flatten()
+    for idx in points:
+        bidx = np.argmin(np.abs(df + dgm[idx, 0]))
+        plt.scatter(X[bidx], Y[bidx], 20, 'k')
+
+def plotTDA(points, yo, df, dgm):
+    plt.figure(figsize=(10, 5))
+    plt.subplot(121)
+    plt.imshow(yo)
+    plotPoints(points, df, dgm)
+
+    plt.colorbar()
+    plt.title("Test Image")
+    plt.subplot(122)
+    plot_diagrams(dgm)
+    plt.title("0-D Persistence Diagram")
+
+    plt.tight_layout()
+    plt.show()
     
     
     
