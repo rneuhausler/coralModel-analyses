@@ -125,9 +125,8 @@ def plotTDA(points, yo, df, dgm):
     plt.figure(figsize=(10, 5))
     plt.subplot(121)
     plt.imshow(yo)
-    plotPoints(points, df, dgm)
-
     plt.colorbar()
+    plotPoints(points, df, dgm)
     plt.title("Test Image")
     plt.subplot(122)
     plot_diagrams(dgm)
