@@ -84,7 +84,7 @@ class Reef():
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
                     
-                elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
+                elif U < (a * (1+algaeDensity) * (1+coralDensity) + 
                           d * (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 2
