@@ -10,10 +10,6 @@ class Organism():
         self.type = type
         self.density = np.zeros(3)
         self.location = location
-        self.typeTracker = {}
-        self.coralDensityTracker = {}
-        self.turfDensityTracker = {}
-        self.algaeDensityTracker = {}
 
 class Reef():
         # append(): Add organisms to create a Reef
@@ -29,6 +25,8 @@ class Reef():
         self.graph = {}
         self.updates = {}
         self.rolls = 0
+        self.coralNodeCount = {}
+        self.coralNeighborCount = {}
         #self.configs = {}
         
     def append(self, node):
@@ -70,11 +68,7 @@ class Reef():
             
     def update(self):
         for key in self.updates:
-            self.nodes[key].density += self.updates[key]
-            self.nodes[key].coralDensityTracker[self.rolls] = self.nodes[key].density[0]
-            self.nodes[key].turfDensityTracker[self.rolls] = self.nodes[key].density[1]
-            self.nodes[key].algaeDensityTracker[self.rolls] = self.nodes[key].density[2]
-            
+            self.nodes[key].density += self.updates[key]          
         self.updates = {}
         
     def roll(self, r, d, a, g, y, dt):
@@ -87,20 +81,27 @@ class Reef():
             turfDensity = self.nodes[i].density[1]/totalDensity
             algaeDensity = self.nodes[i].density[2]/totalDensity
 
-            if self.nodes[i].type == 0:   
+            if self.nodes[i].type == 0:
+                
+                ## Counting Number of Coral Nodes and adding their Neighborhood Type Count
+                ## Can divide denisties by number of coral nodes to get average
+                if self.rolls not in self.coralNodeCount:
+                    self.coralNodeCount[self.rolls] = 0
+                    self.coralNeighborCount[self.rolls] = np.zeros(3)
+                self.coralNodeCount[self.rolls] += 1
+                self.coralNeighborCount[self.rolls] += self.nodes[i].density
+                ##
                 
                 if U <  (d / (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
-                    self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
                     
                 elif U < (a * (1+algaeDensity) + 
                           d / (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
-                    self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
 
             elif self.nodes[i].type == 1:
                 
@@ -108,22 +109,18 @@ class Reef():
                     
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
-                    self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
                     
                 elif U < (y * (1+algaeDensity) +
                           r * (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
-                    self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
 
             elif self.nodes[i].type == 2:
                 
                 if U < g * (1/(1 + algaeDensity + turfDensity)) * dt: #needed to add the one now that the                                                       node is not counting itself
                     self.nodes[i].type = 1
                     self.inform(initial = 2, final = 1, nodeID = i)
-                    self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
-
 
         self.update()
         self.rolls += 1
