@@ -87,9 +87,9 @@ class Reef():
                 ## Can divide denisties by number of coral nodes to get average
                 if self.rolls not in self.coralNodeCount:
                     self.coralNodeCount[self.rolls] = 0
-                    self.coralNeighborCount[self.rolls] = np.zeros(3)
+                    self.coralNeighborCount[self.rolls] = 0
                 self.coralNodeCount[self.rolls] += 1
-                self.coralNeighborCount[self.rolls] += self.nodes[i].density
+                self.coralNeighborCount[self.rolls] += self.nodes[i].density[0]
                 ##
                 
                 if U <  (d / (1+coralDensity)) * dt:
