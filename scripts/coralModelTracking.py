@@ -53,7 +53,7 @@ class Reef():
         self.graph = {self.nodes[i].ID:list(self.nodes[j].ID 
                       #can add things, e.g. self.nodes[j].type
                                             for j,val in enumerate(self.nodes)
-                      #if self.nodes[i].ID != self.nodes[j].ID
+                                            if self.nodes[i].ID != self.nodes[j].ID
                                             if Reef.distance(
                                                     self.nodes[i].location,
                                                     self.nodes[j].location)
@@ -89,14 +89,14 @@ class Reef():
 
             if self.nodes[i].type == 0:   
                 
-                if U <  (d * (1+coralDensity)) * dt:
+                if U <  (d / (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
                     self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
                     
-                elif U < (a * (1+algaeDensity) * (1+coralDensity) + 
-                          d * (1+coralDensity)) * dt:
+                elif U < (a * (1+algaeDensity) + 
+                          d / (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
@@ -104,14 +104,14 @@ class Reef():
 
             elif self.nodes[i].type == 1:
                 
-                if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
+                if U < (r * (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
                     self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
                     
-                elif U > 1 - (y * (1+algaeDensity) * (1+turfDensity) + 
-                              r * (1+coralDensity) * (1+turfDensity)) * dt:
+                elif U < (y * (1+algaeDensity) +
+                          r * (1+coralDensity)) * dt:
                     
                     self.nodes[i].type = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
@@ -119,8 +119,7 @@ class Reef():
 
             elif self.nodes[i].type == 2:
                 
-                if U < g * (1+(algaeDensity/(algaeDensity + turfDensity))) * dt:
-                    
+                if U < g * (1/(1 + algaeDensity + turfDensity)) * dt: #needed to add the one now that the                                                       node is not counting itself
                     self.nodes[i].type = 1
                     self.inform(initial = 2, final = 1, nodeID = i)
                     self.nodes[i].typeTracker[self.rolls] = self.nodes[i].type
