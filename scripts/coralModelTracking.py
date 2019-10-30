@@ -118,7 +118,7 @@ class Reef():
 
             elif self.nodes[i].type == 2:
 
-                if U < g /(algaeDensity + turfDensity) * dt: #needed to add the one now that the                                                       node is not counting itself
+                if U < g /(1 + algaeDensity + turfDensity) * dt:
                     self.nodes[i].type = 1
                     self.inform(initial = 2, final = 1, nodeID = i)
 
