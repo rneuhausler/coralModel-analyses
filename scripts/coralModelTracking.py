@@ -104,6 +104,12 @@ class Reef():
                     self.inform(initial = 0, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 1:
+                
+                if self.rolls not in self.coralNodeCount:
+                    self.coralNodeCount[self.rolls] = 0
+                    self.coralNeighborCount[self.rolls] = 0
+                self.coralNodeCount[self.rolls] += 0
+                self.coralNeighborCount[self.rolls] += 0
 
                 if U < (r * coralDensity) * dt:
 
@@ -117,6 +123,12 @@ class Reef():
                     self.inform(initial = 1, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 2:
+                
+                if self.rolls not in self.coralNodeCount:
+                    self.coralNodeCount[self.rolls] = 0
+                    self.coralNeighborCount[self.rolls] = 0
+                self.coralNodeCount[self.rolls] += 0
+                self.coralNeighborCount[self.rolls] += 0
 
                 if U < g /(1 + algaeDensity + turfDensity) * dt:
                     self.nodes[i].type = 1
