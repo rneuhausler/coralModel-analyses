@@ -11,7 +11,6 @@ class Organism():
         self.density = np.zeros(3)
         self.location = location
         
-        
 class Reef():
         # append(): Add organisms to create a Reef
         
@@ -49,7 +48,7 @@ class Reef():
         self.graph = {self.nodes[i].ID:list(self.nodes[j].ID 
                       #can add things, e.g. self.nodes[j].type
                                             for j,val in enumerate(self.nodes)
-                      #if self.nodes[i].ID != self.nodes[j].ID
+                                            if self.nodes[i].ID != self.nodes[j].ID
                                             if Reef.distance(
                                                     self.nodes[i].location,
                                                     self.nodes[j].location)
@@ -70,6 +69,7 @@ class Reef():
         self.updates = {}
         
     def roll(self, r, d, a, g, y, dt):
+        
         for i, val in enumerate(self.nodes):      
             U = random.uniform(0,1)
             totalDensity = self.nodes[i].density.sum()
@@ -79,35 +79,45 @@ class Reef():
 
             if self.nodes[i].type == 0:   
                 
-                if U <  (d * (1+coralDensity)) * dt:
-                    
+                if U <  (d / (1+coralDensity)) * dt:
+
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
-                    
-                elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
-                          d * (1+coralDensity)) * dt:
-                    
+
+                elif U < (a * algaeDensity +
+                          d / (1+coralDensity)) * dt:
+
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 1:
                 
-                if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
-                    
+                if U < (r * coralDensity) * dt:
+
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
-                    
-                elif U > 1 - (y * (1+algaeDensity) * (1+turfDensity) + 
-                              r * (1+coralDensity) * (1+turfDensity)) * dt:
-                    
+
+                elif U < (y * algaeDensity +
+                          r * coralDensity) * dt:
+
                     self.nodes[i].type = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 2:
                 
-                if U < g * (1+(algaeDensity/(algaeDensity + turfDensity))) * dt:
-                    
+                if U < g /(1 + algaeDensity + turfDensity) * dt:
                     self.nodes[i].type = 1
                     self.inform(initial = 2, final = 1, nodeID = i)
 
         self.update()
+        
+class Ocean():
+    
+    # To capture reefs going through multiple simulations
+    
+    def __init__(self):
+        self.simulation = []
+
+    def append(self, simulation):
+        self.simulation.append(simulation)
+

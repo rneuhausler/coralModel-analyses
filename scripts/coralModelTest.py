@@ -1,109 +1,126 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-from coralModel import Reef
-from coralModel import Organism
+## Libraries
+from coralModelUpdated import Reef, Organism, Ocean
 import numpy as np
-#import random
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
+import sys
+import math
+import matplotlib.pyplot as plt 
+from multiprocessing import Pool
+import pickle
+import pandas as pd
 
+## Input Parameters
 
-#Set Parameters
-NumberOfRuns = 100
-NumberOfSimulations = 100
+nProcessors = 4
+threshold = 1.45                            
 coralPercent = .33
 algaePercent = .33
-turfPercent = 1 - coralPercent - algaePercent
 r=1.0
-d=.4
+d=.4 
 a=.2
-g=.3
 y=.75
-dt=.01
+g=.4
 
-length = 10
-width = 10
-NumberOfNodes = length * width
-coralCount = np.zeros((NumberOfRuns, NumberOfSimulations))
-turfCount = np.zeros((NumberOfRuns, NumberOfSimulations))
-algaeCount = np.zeros((NumberOfRuns, NumberOfSimulations))
-types = np.zeros((NumberOfRuns, NumberOfNodes, NumberOfSimulations))
+#Time and Grid Settings
+NumberOfSimulations = 100
+tf, dt= 20, .1 
+rows, columns = 15, 15
+
+#Also need blobSize, blobValue
+gridOption = 0
 
 
-for s in range(0,NumberOfSimulations):
+## Calculated from Input Parameters
+
+turfPercent = 1 - coralPercent - algaePercent
+NumberOfTimesteps = int(tf/dt)
+NumberOfNodes = rows * columns
+
+## Grid Options Setup
+if gridOption == 1: #setup checkered
+    m = rows + 2
+    n = columns + 2
+    checkerBoard = np.tile(np.array([[0,1,2],[1,2,0],[2,0,1]]), ((m+2)//3, (n+2)//3))
     
-#Generate square 8x8 reef with randomly assigned types
-#0 = Coral, 1 = Turf, 2 = Algae
+elif gridOption == 2: #setup blob
+    
+    blobSize = 5 #input system argument
+    blobValue = 0 #input system argument
+    notBlob = [a for a in [0,1,2] if a != blobValue]
+    
+    center = (rows/2, columns/2)
+    distanceGrid = np.array([Reef.distance([i+.5,j+.5], center)
+                             for i in range(0,rows)
+                             for j in range(0,columns)]).reshape(rows,columns)
+    blobLocations = (np.where(distanceGrid < blobSize))
+    blobLocations = [(blobLocations[0][n],blobLocations[1][n]) 
+                      for n in range(0,len(blobLocations[0]))]
+
+data = np.zeros((NumberOfTimesteps, NumberOfNodes))
+
+## Model Run Function
+
+def runModel(simulation):
+    print('running simulation' + str(simulation))
     Moorea = Reef()
     count = 0
-    for i in range(0,length):
-        for j in range(0, width):
-            U = np.random.choice([0,1,2],
-                                 p=[coralPercent, turfPercent, algaePercent])
+    
+    ## Creating the reef
+    for i in range(0,rows):
+        for j in range(0,columns):
+            
+            if gridOption == 0:
+                U = np.random.choice([0,1,2],
+                                     p=[coralPercent, turfPercent, algaePercent])
+            elif gridOption == 1:
+                U = checkerBoard[i,j]
+            
+            elif gridOption == 2:
+                if (i,j) in blobLocations: 
+                    U = blobValue
+                else:
+                    U = np.random.choice(notBlob,
+                                         p=[.5, .5])
             node = Organism(type=U, location=[i,j], ID=count)
             Moorea.append(node)
             count = count + 1
-    Moorea.generateGraph()
-    #NumberOfNodes = count
+    Moorea.generateGraph(threshold)
     
-#Run model 
-    for n in range(0,NumberOfRuns):
+    ## Running new reef through time
+    for n in range(0,NumberOfTimesteps):
         for i,val in enumerate(Moorea.nodes):
-            types[n,i,s] = Moorea.nodes[i].type
-        coralCount[n,s] = np.count_nonzero(types[n,:,s] == 0)
-        turfCount[n,s] = np.count_nonzero(types[n,:,s] == 1)
-        algaeCount[n,s] = np.count_nonzero(types[n,:,s] == 2)
+            data[n,i] = Moorea.nodes[i].type
         Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)
+    
+    if simulation = 0: ## check on progress
+        plt.figure()
+        plt.imshow(np.reshape(np.array([Moorea.nodes[i].type for
+                                        i,val in enumerate(Moorea.nodes)]),(rows,columns)))
+    return(data)
+ 
+## Run Model
+    
+if __name__ == '__main__':
+        
+    with Pool(nProcessors) as p:
+        results = p.map(runModel, np.arange(NumberOfSimulations)) ## function, argument
 
-#save data (probably don't want to save, it's huge)
-#np.savetxt("modelOutput.csv", types, delimiter=",")
+## Save Output File
 
+path = 'outputFolder/'
+output_name = 'parameterValues'
+outfile = open(path+output_name, "wb") #open pickle jar
+pickle.dump(results, outfile)           #put contents into jar
+outfile.close()                        #close the jar
 
-#Plotting inital and last spatial distribution of model runs
-fig, (ax, ax2, cax) = plt.subplots(1,3, 
-     gridspec_kw={'width_ratios':[1,1, 0.05]})
-fig.subplots_adjust(wspace=0.3)
-cmap = plt.get_cmap('Pastel1', 3)
-im = ax.imshow(np.reshape(types[0,:,0], (-1, length)), cmap=cmap)
-im2 = ax2.imshow(np.reshape(types[NumberOfRuns-1,:,0], (-1, length)), cmap=cmap)
+## Pull some information (using parallelization) and save into pandas table
 
-ip = InsetPosition(ax2, [1.05,0,0.05,1]) 
-cax.set_axes_locator(ip)
-fig.colorbar(im, cax=cax, ax=[ax,ax2], ticks=[0,1,2])
-ax.set_title("Spatial dist. of Reef Types, t=0, Sim 1")
-ax2.set_title("Spatial dist. of Reef Types, t=100, Sim 1")
-plt.show()
-
-
-#Plotting histograms
-fig, (ax, ax2, ax3) = plt.subplots(1,3, facecolor = 'w', sharey='row')
-x = np.arange(NumberOfRuns)
-im = ax.bar(x, coralCount.mean(axis=1), color='pink')
-im2 = ax2.bar(x, turfCount.mean(axis=1), color='navajowhite')
-im2 = ax3.bar(x, algaeCount.mean(axis=1), color='gainsboro')
-ax.set_ylabel("Average Count over 100 Simulations")
-ax.set_xlabel("Time")
-ax2.set_xlabel("Time")
-ax3.set_xlabel("Time")
-ax.set_facecolor('white')
-ax2.set_facecolor('white')
-ax3.set_facecolor('white')
-
-
-#Plotting progression over time for 1 simulation
-fig1 = plt.figure()
-x = np.arange(NumberOfRuns)
-im = plt.plot(x, coralCount[:,1], color='pink')
-im2 = plt.plot(x, turfCount[:,1], color='navajowhite')
-im2 = plt.plot(x, algaeCount[:,1], color='gainsboro')
-plt.legend(['Coral', 'Turf', 'Algae'], loc='upper left', fontsize = 'medium')
-plt.ylabel("Percent")
-plt.xlabel("Time")
-plt.show()
-
-
+## save csv files
+path = 'outputFolder/'
+output_name = 'summary'
+np.savetxt(path+ output_name + '.csv', types, delimiter=",")
 
 
 
