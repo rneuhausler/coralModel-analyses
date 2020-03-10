@@ -18,23 +18,19 @@ class Reef():
         # based on their defined 2-d coordinate location
 
         # roll(): one stochastic update of each node, weighted odds based on
-        # differential equation in documentation
+        # neighboring node types and differential equation in documentation
 
     def __init__(self):
         self.nodes = []
         self.graph = {}
         self.updates = {}
         self.rolls = 0
-        self.coralNodeCount = {}
-        self.coralNeighborCount = {}
-        self.macroNodeCount = {}
-        self.macroNeighborCount = {}
-        self.turfNodeCount = {}
-        self.turfNeighborCount = {}
+        self.table = np.zeros((1,1))
         #self.configs = {}
 
     def append(self, node):
         self.nodes.append(node)
+        self.count = np.append(self.count, np.zeros((1,1)), axis = 1)
 
     def distance(a,b):
         dx = a[0] - b[0]
@@ -53,7 +49,6 @@ class Reef():
 
     def generateGraph(self, threshold=1.5):
         self.graph = {self.nodes[i].ID:list(self.nodes[j].ID
-                      #can add things, e.g. self.nodes[j].type
                                             for j,val in enumerate(self.nodes)
                                             if self.nodes[i].ID != self.nodes[j].ID
                                             if Reef.distance(
@@ -76,8 +71,13 @@ class Reef():
         self.updates = {}
 
     def roll(self, r, d, a, g, y, dt):
+        
+        self.count = np.append(self.count, np.zeros(1, self.count.shape[1]), axis = 0)
 
         for i, val in enumerate(self.nodes):
+            
+            ## record count
+            self.count[self.rolls, self.nodes[i].type] += 1
 
             U = random.uniform(0,1)
             totalDensity = self.nodes[i].density.sum()
@@ -86,91 +86,35 @@ class Reef():
             algaeDensity = self.nodes[i].density[2]/totalDensity
 
             if self.nodes[i].type == 0:
-
-                ## Counting Number of Coral Nodes and adding their Neighborhood Type Count
-                ## Can divide denisties by number of coral nodes to get average
                 
-                if self.rolls not in self.coralNodeCount:
-                    self.coralNodeCount[self.rolls] = 0
-                    self.coralNeighborCount[self.rolls] = 0
-                self.coralNodeCount[self.rolls] += 1
-                self.coralNeighborCount[self.rolls] += self.nodes[i].density[0]
-                
-                if self.rolls not in self.turfNodeCount:
-                    self.turfNodeCount[self.rolls] = 0
-                    self.turfNeighborCount[self.rolls] = 0
-                self.turfNodeCount[self.rolls] += 0
-                self.turfNeighborCount[self.rolls] += 0
-                
-                if self.rolls not in self.macroNodeCount:
-                    self.macroNodeCount[self.rolls] = 0
-                    self.macroNeighborCount[self.rolls] = 0
-                self.macroNodeCount[self.rolls] += 0
-                self.macroNeighborCount[self.rolls] += 0
-                
-                ##
+                ## record neighborhood
+                self.count[self.rolls, self.nodes[i].type + 3] += self.nodes[i].density[0]
 
                 if U <  (d / (1+coralDensity)) * dt:
-
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
-
                 elif U < (a * algaeDensity +
                           d / (1+coralDensity)) * dt:
-
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 1:
                 
-                if self.rolls not in self.coralNodeCount:
-                    self.coralNodeCount[self.rolls] = 0
-                    self.coralNeighborCount[self.rolls] = 0
-                self.coralNodeCount[self.rolls] += 0
-                self.coralNeighborCount[self.rolls] += 0
-                
-                if self.rolls not in self.turfNodeCount:
-                    self.turfNodeCount[self.rolls] = 0
-                    self.turfNeighborCount[self.rolls] = 0
-                self.turfNodeCount[self.rolls] += 1
-                self.turfNeighborCount[self.rolls] += self.nodes[i].density[1]
-            
-                if self.rolls not in self.macroNodeCount:
-                    self.macroNodeCount[self.rolls] = 0
-                    self.macroNeighborCount[self.rolls] = 0
-                self.macroNodeCount[self.rolls] += 0
-                self.macroNeighborCount[self.rolls] += 0
+                ## record neighborhood
+                self.count[self.rolls, self.nodes[i].type + 3] += self.nodes[i].density[1]
 
                 if U < (r * coralDensity) * dt:
-
                     self.nodes[i].type = 0
                     self.inform(initial = 1, final = 0, nodeID = i)
-
                 elif U < (y * algaeDensity +
                           r * coralDensity) * dt:
-
                     self.nodes[i].type = 2
                     self.inform(initial = 1, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 2:
                 
-                if self.rolls not in self.coralNodeCount:
-                    self.coralNodeCount[self.rolls] = 0
-                    self.coralNeighborCount[self.rolls] = 0
-                self.coralNodeCount[self.rolls] += 0
-                self.coralNeighborCount[self.rolls] += 0
-                
-                if self.rolls not in self.turfNodeCount:
-                    self.turfNodeCount[self.rolls] = 0
-                    self.turfNeighborCount[self.rolls] = 0
-                self.turfNodeCount[self.rolls] += 0
-                self.turfNeighborCount[self.rolls] += 0
-                
-                if self.rolls not in self.macroNodeCount:
-                    self.macroNodeCount[self.rolls] = 0
-                    self.macroNeighborCount[self.rolls] = 0
-                self.macroNodeCount[self.rolls] += 1
-                self.macroNeighborCount[self.rolls] += self.nodes[i].density[2]
+               ## record neighborhood
+                self.count[self.rolls, self.nodes[i].type + 3] += self.nodes[i].density[2]    
 
                 if U < g /(1 + algaeDensity + turfDensity) * dt:
                     self.nodes[i].type = 1
