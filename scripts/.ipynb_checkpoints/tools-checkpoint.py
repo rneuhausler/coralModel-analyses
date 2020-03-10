@@ -11,6 +11,11 @@ from persim import plot_diagrams
 
 ## Functions
 
+def dictToNumpy(dictionary):
+    output = list(dictionary.values())
+    output = np.array(output)
+    return(output)
+
 def shaper(df, rows):
     df = np.reshape(df, (-1, rows))
     return(df)
@@ -318,7 +323,4 @@ def plotPoints(points, df, dgm):
 
 
    
-def dictToNumpy(dictionary):
-    output = list(dictionary.values())
-    output = np.array(output)
-    return(output)
+
