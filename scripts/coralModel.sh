@@ -1,6 +1,6 @@
 ### Inputs
 nProcessors=4
-NumberOfSimulations=2
+NumberOfSimulations=3
 
 coralPercent=.33
 algaePercent=.33
@@ -17,7 +17,7 @@ recordRate=900
 #loop through g, nested loop through gridoption (once ready)
 r=1.0
 d=.4 
-a=.
+a=.2
 g=.4 #array
 y=.75
 dt=.1 

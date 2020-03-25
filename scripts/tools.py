@@ -7,9 +7,37 @@ from ripser import ripser, lower_star_img
 from persim import plot_diagrams
 
 
+def generateCheckerBoard(rows, columns):
+    m = rows + 2
+    n = columns + 2
+    checkerBoard = np.tile(np.array([[0,1,2],[1,2,0],[2,0,1]]), 
+                           ((m+2)//3, (n+2)//3))
+    return(checkerBoard)
+
+def generateBlob(blobPercent, blobValue):
+    blobValue = int(sys.argv[18])
+    notBlob = [a for a in [0,1,2] if a != blobValue]   
+    center = (rows/2, columns/2)
+    distanceGrid = np.array([Reef.distance([i+.5,j+.5], center)
+                             for i in range(0,rows)
+                             for j in range(0,columns)])
+    maxDistance = np.sort(distanceGrid)[round(blobPercent*NumberOfNodes)]
+    blobLocations = (np.where(distanceGrid.reshape(rows,columns) < maxDistance))
+    blobLocations = [(blobLocations[0][n],blobLocations[1][n]) 
+                     for n in range(0,len(blobLocations[0]))]
+    return(blobLocations, notBlob)
 
 
-## Functions
+def densityExtract(Moorea, Type, Count):
+    if Count == 0:
+        neighbors = 0
+    else:
+        neighbors = np.array([Moorea.nodes[n].density/
+                              Moorea.nodes[n].density.sum()
+                              for n,val in enumerate(Moorea.nodes)
+                              if Moorea.nodes[n].type == Type]).mean(axis=0)[Type]
+    return(neighbors)
+
 
 def shaper(df, rows):
     df = np.reshape(df, (-1, rows))
@@ -31,14 +59,6 @@ def tdaPrep(df, rows, ones='coral'):
     df = shaper(df,rows)
     dfi = shaper(dfi,rows)
     return(df, dfi)
-
-def readPrep(simulation, timestep, rows):
-    
-    df = np.genfromtxt('coralModelStatsReadyOutput/modelOutput_switching'
-                         +str(simulation)+'.csv', delimiter=',')
-    df = np.reshape(df, (-1, rows**2))
-    df = df[timestep,:]
-    return(df)
 
 def patchCounts(sim, rows):
 
@@ -64,6 +84,7 @@ def patchCounts(sim, rows):
 
 
 
+'''
 
 def genOut(grazesim):
     x = list(grazesim.simulation[1].coralNodeCount.keys())
@@ -322,3 +343,5 @@ def dictToNumpy(dictionary):
     output = list(dictionary.values())
     output = np.array(output)
     return(output)
+    
+    '''
