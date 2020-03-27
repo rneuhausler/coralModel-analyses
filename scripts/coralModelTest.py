@@ -13,13 +13,13 @@ from multiprocessing import Pool
 
 nProcessors = int(sys.argv[1])
 NumberOfSimulations = int(sys.argv[2])
-coralPercent = float(sys.argv[3])
-algaePercent = float(sys.argv[4])
+coralPercent = float(sys.argv[3])/100
+algaePercent = float(sys.argv[4])/100
 gridOption = int(sys.argv[5])
 rows, columns = int(sys.argv[6]), int(sys.argv[7])
 threshold = float(sys.argv[8])
 recordRate = int(sys.argv[9])
-r, d, a, y, g, dt, tf = [float(sys.argv[n]) for n in range(10,17)]
+r, d, a, g, y, dt, tf = [float(sys.argv[n]) for n in range(10,17)]
 NumberOfTimesteps = int(tf/dt)
 NumberOfRecordedTimesteps = round(NumberOfTimesteps / recordRate)
 NumberOfNodes = rows * columns
@@ -30,9 +30,7 @@ elif gridOption == 2:
     blobLocations, notBlob = tl.generateBlob(coralPercent,
                                               blobValue =
                                               int(sys.argv[18])) 
-
 ##  Functions
-
 
 def createReef():
     Moorea = Reef()
@@ -85,25 +83,27 @@ def runModel(simulation):
         if timestep == 0:
             table = pd.DataFrame([])
         if timestep % recordRate == 0:
-            table = pd.concat([table, pullInfo(Moorea, simulation, timestep)])      ## 
+            table = pd.concat([table, pullInfo(Moorea, simulation, timestep)])
             
         Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)
         
     return(table)
 
-
 ## Run
-
 
 if __name__ == '__main__':
        
     with Pool(nProcessors) as p:
-        output = pd.concat(p.map(runModel, np.arange(NumberOfSimulations)))     ##
+        output = pd.concat(p.map(runModel, np.arange(NumberOfSimulations)))
         
     output.columns = ['Simulation', 'Timestep', 'CoralCount', 'TurfCount',
                       'MacroalgaeCount', 'Coral-CoralNeighbors', 
                       'Turf-TurfNeighbors', 'Macro-MacroNeighbors',
-                      'CoralPatchCount', 'AlgaePatchCount', 'TurfPatchCount',
+                      'CoralPatchCount', 'AlgaePatchCount', 'TurfPatchCount', 
                       'MacroPatchCount']
     
-    output.to_csv('table.csv', header=True, index=False)
+    path='./output/'+str(rows)+'x'+str(columns)+'/grid'+str(gridOption)+'/grazing'+str(int(g*100))+'/'
+    
+    name='coral'+str(int(coralPercent*100))+'-macro'+str(int(algaePercent*100))+'-r'+str(int(r*10))+'-d'+str(int(d*100))+'-a'+str(int(a*100))+'-y'+str(int(y*100))+'-time'+str(NumberOfTimesteps)+'-rec'+str(recordRate)+'-nsim'+str(NumberOfSimulations)
+    
+    output.to_csv(path+name+'.csv', header=True, index=False)

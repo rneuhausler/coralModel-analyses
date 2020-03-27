@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as clt
 import PIL
+import os
+import pandas as pd
+import re
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 from ripser import ripser, lower_star_img
 from persim import plot_diagrams
@@ -80,7 +83,11 @@ def patchCounts(sim, rows):
     
     return(countCoralPatches, countAlgaePatches, countTurfPatches, countMacroPatches)
 
-
+def pandasHistogram(dataframe, variable, by):
+    test = dataframe.hist(column=variable,
+                          by=by, figsize=(3,10),
+                          layout=(3,1), sharex=True, sharey=True)
+    return(test)
 
 
 

@@ -1,9 +1,9 @@
 ### Inputs
 nProcessors=4
-NumberOfSimulations=3
+NumberOfSimulations=10
 
-coralPercent=.33
-algaePercent=.33
+coralPercent=33
+algaePercent=33
 gridOption=0 #array
 
 #Time and Grid Settings
@@ -11,7 +11,7 @@ rows=15
 columns=15
 threshold=1.45 
 
-recordRate=900
+recordRate=90
 
     ## table for first run. later averages
 #loop through g, nested loop through gridoption (once ready)
@@ -21,12 +21,17 @@ a=.2
 g=.4 #array
 y=.75
 dt=.1 
-tf=200 #can play with this value as well
+tf=50 #can play with this value as well
 
 blobValue=0
 
+## create directory
+grazingFolder=$(python -c "print(int($g*100))")
+mkdir -p 'output'/$rows'x'$columns/'grid'$gridOption/'grazing'$grazingFolder
 
+## run simulation
 python coralModelTest.py $nProcessors $NumberOfSimulations $coralPercent $algaePercent $gridOption $rows $columns $threshold $recordRate $r $d $a $g $y $dt $tf $blobValue
+
 
 
 ## histograms - count, neighbors, npatches - nice to compare different initial grids
