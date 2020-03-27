@@ -140,7 +140,10 @@ The inclusion of the local type density can be seen in the code below, showing h
 ```
 
 
-### Outputs
+### Outputs and Metrics
+
+We pull and save the folowing metrics for each model run.
+
 
 Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
 `output/15x15/grid0/grazing30/coral33-macro33-r10-d40-a20-y75-time5010-rec500-nsim100.csv`
