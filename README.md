@@ -142,7 +142,14 @@ The inclusion of the local type density can be seen in the code below, showing h
 
 ### Outputs
 
-Currently, `coralModelTest.py` plots 
+Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
+`output/15x15/grid0/grazing30/coral33-macro33-r10-d40-a20-y75-time5010-rec500-nsim100.csv`
+This translates to:
+
+output/grid size/initial grid option/grazing value(x100 to remove decimals)/
+coral percent, macroalgae percent, inputs r, d, a, y, final time, record rate, and number of simulations
+
+You can visualize the output data using `modelOutputViewer.ipynb`. Running the notebook generates the following plots:
 
  1. The initial and final spatial configurations of the instance `Reef()`, side-by-side
  2. The timeseries of each type's count for the 100 runs
@@ -167,12 +174,20 @@ cd coralModel/scripts
 ```
 4. Run the model
 ```
-python3.6 coralModelTest.py
+sh coralModel.sh
 ```
 
-It usually takes a few seconds to run. You will know it's complete when a figure showing the initial and final grid pop up.
+### Exploring the outputs
 
-You can also simply run this script using any of your favorite python IDEs.
+Once the model is done running, you should see a folder titled `output` in the `scripts` folder. In here, you will find all the csv files (described above) organized into folders named after some of the input parameters. To explore your outputs:
+
+1. Open jupyter notebook (or lab)
+```
+jupyter notebook 
+```
+2. Within jupyter, open `modelOutputViewer.ipynb`
+
+
 
 
 ### References
