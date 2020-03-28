@@ -41,7 +41,7 @@ From the equations above, we extract a set of 5 reactions that describe the prob
 
 We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood densities and agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local densities (based on neighborhood benthic compositions) instead of global percentages (reef-wide). We implement this through the spatial explicitness of our model.
 
-Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism() `, and appending them to an instance of the class `Reef()`. 
+Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism()`, and appending them to an instance of the class `Reef()`. 
 
 We define these classes in `coralModel.py` as follows:
 
@@ -243,7 +243,7 @@ cd coralModel/scripts
 ```
 sh coralModel-grazingLoop.sh
 ```
-Once the model is done running, you should see a folder titled `/output` in the `/scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs and Metrics). 
+Once the model is done running, you should see a folder titled `/output` in the `/scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs). 
 
 To explore your outputs:
 
