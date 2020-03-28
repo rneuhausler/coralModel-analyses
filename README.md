@@ -50,7 +50,7 @@ From the equations above, we extract a set of 5 reactions that describe the prob
 
 We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood densities and agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local densities (based on neighborhood benthic compositions) instead of global percentages (reef-wide). We implement this through the spatial explicitness of our model.
 
-Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism()`, and appending them to an instance of the class `Reef()`. 
+Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism()` that become appended to an instance of the class `Reef()`. 
 
 We define these classes in `coralModel.py` as follows:
 
@@ -87,16 +87,16 @@ As can be seen above, each `Organism` carries the knowledge of:
 3. Location: a 2 dimensional coordinate location of that node, used in determining neighboring nodes.
 
 
-We define class `Reef()` to have a graph listing each appended `Organism()`'s neighbors. This is first generated when the `Reef()` is fully appended with `Organism()`s, using our function `generateGraph()`, calls for a threshold, i.e the radius distance to use when considering neighbors.
+We define class `Reef()` to have a graph listing each appended `Organism()`'s neighbors. This is first generated when the `Reef()` is fully appended with `Organism()`s, and done using our function `generateGraph()`. Given the argument `threshold`, `generateGraph()` calculates for each node (class `Organism()`) the nodes within that given distance threshold (i.e. radius).
 
-The purpose in all of this is to be able to run the function `roll()`. With this function, we check to update each of the appended `Organism()`'s type in the given `Reef()`. An `Organism()`'s type is only updated when a freshly randomly generated value (RGV) falls within the range set by the current node's conditions (calculated using the weights shown on the arrows of our reactions above).
+The purpose in all of this is to be able to run the function `roll()`. With this function, we check to update each of the appended `Organism()`'s type in the given `Reef()`. An `Organism()`'s type is only updated when a freshly randomly generated variable (RGV) falls within the range set by the current node's conditions (calculated using the weights shown on the arrows of our reactions above).
 
-This GitHub repository contains various python and shell scripts that allow for the user to create a reef, and take it through a set number of time steps using `roll()`. The potential initial reef setups and model variabilities are described next.   
+This GitHub repository contains various python and shell scripts that allow for the user to create a reef and take it through a set number of iterations of `roll()`. The various potential initial reef setups and model dynamics are described next.   
 
 
 ### Model Setup
 
-In this repository, within `/scripts`, you will find a shell script called `coralModel.sh`. Within this file you will the option to adjust the following (comments not included in the file):
+Model runs are initiated using shell scripts, found within `/scripts`. Within the most simple model setup, `coralModel.sh` you have the option to adjust the following (comments not included in the file):
 
 * The number of cores used to run model simulations in parallel on:
 ```python
@@ -135,12 +135,11 @@ g=.4
 y=.75
 ```
 
-
 ### Model Run
 
 Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
-Within `coralModelTest.py`, you will find `runModel()` whitch creates the reef described in the .sh file and uses `roll()` to update the given reef for the set number of timesteps you set.
+Within `coralModelTest.py`, you will find `runModel()` which creates the reef described in the .sh file and uses `roll()` to update the given reef for the set number of timesteps you set.
 
 ```python
 def runModel(simulation):
