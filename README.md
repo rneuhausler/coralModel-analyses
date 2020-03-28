@@ -38,7 +38,7 @@ Below is an example of an 15x15 node reef's composition initially and after 100 
 ![](images/exampleOutput/InitialFinal.png)
 
 
-### Model Structure
+## Model Structure
 
 We derived the rules for our model's dynamics from Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
 
@@ -94,7 +94,7 @@ The purpose in all of this is to be able to run the function `roll()`. With this
 This GitHub repository contains various python and shell scripts that allow for the user to create a reef and take it through a set number of iterations of `roll()`. The various potential initial reef setups and model dynamics are described next.   
 
 
-### Model Setup
+## Model Setup
 
 Model runs are initiated using shell scripts, found within `/scripts`. Within the most simple model setup, `coralModel.sh` you have the option to adjust the following (comments not included in the file):
 
@@ -135,7 +135,7 @@ g=.4
 y=.75
 ```
 
-### Model Run
+## Model Run
 
 Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
