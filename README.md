@@ -17,7 +17,7 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * Algal turf
 * Macroalgae
 
-The model consists of various nodes, each of which is assigned one of these types of benthic coverage. 
+The model consists of various nodes, each of which is assigned one of the benthic coverage types listed above. 
 Over time, a node's type updates stochastically through probabilities weighted by:
 1. Overall reef conditions defined through input parameters, and
 2. The node's immediate neighbors' types.
@@ -25,6 +25,7 @@ Over time, a node's type updates stochastically through probabilities weighted b
 Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
 
 (0=Coral, 1=Turf, 2=Macroalgae).:
+
 ![](images/exampleOutput/initialFinal.png)
 
 
@@ -34,12 +35,11 @@ Below is an example of an 15x15 node reef's composition initially and after 100 
 
 ![](images/mumbyEquations.png)
 
-From the equations above, we extract a set of 5 reactions that describe the probabilities of a the different node types to switch:
+From the equations above, we extract a set of 5 reactions that describe the probabilities of switching between the respective node types:
 
 ![](images/mumbyAdjusted.png)
 
-We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood densities. In our reactions above, we represent `M`, `T`, `C` as local densities (based on neighborhood benthic compositions) instead of global percentages (reef-wide), which we are only able to do given the spatial explicitness of our model.
-
+We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood densities and agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local densities (based on neighborhood benthic compositions) instead of global percentages (reef-wide). We implement this through the spatial explicitness of our model.
 
 Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism() `, and appending them to an instance of the class `Reef()`. 
 
@@ -71,43 +71,68 @@ class Reef():
 ```
 
 
-As can be seen above, each `Organism` has a specific type, density (
+As can be seen above, each `Organism` carries the knowledge of:
 
+1. It's specific type: 0 for Coral, 1 for Turf, 2 for Macroalgae .
+2. The neighborhood density: an array of length three, containing the number of each benthic type represented in the set of neighboring nodes (indexed by the type value from 1.).
+3. Location: a 2 dimensional coordinate location of that node, used in determining neighboring nodes.
+
+
+We define class `Reef()` to have a graph listing each appended `Organism()`'s neighbors. This is first generated when the `Reef()` is fully appended with `Organism()`s, using our function `generateGraph()`, calls for a threshold, i.e the radius distance to use when considering neighbors.
+
+The purpose in all of this is to be able to run the function `roll()`. With this function, we check to update each of the appended `Organism()`'s type in the given `Reef()`. An `Organism()`'s type is only updated when a freshly randomly generated value (RGV) falls within the range set by the current node's conditions (calculated using the weights shown on the arrows of our reactions above).
+
+This GitHub repository contains various python and shell scripts that allow for the user to create a reef, and take it through a set number of time steps using `roll()`. The potential initial reef setups and model variabilities are described next.   
 
 
 #### Model Setup
 
+In this repository, within `/scripts`, you will find a shell script called `coralModel.sh`. Within this file you will the option to adjust the following (comments not included in the file):
+
+* The number of cores used to run model simulations in parallel on:
+```python
+nProcessors=4
+NumberOfSimulations=10
+```
+* The initial grid setup:
+```python
+coralPercent=33 ## percentage of initial nodes that are coral
+algaePercent=33 ## percentage of initial nodes that are macroalgae
+gridOption=0 ## grid options 0=random,1=checkered,2=with blob of one type in center
+blobValue=0 ## only used is gridOption=2
+``` 
+The resultant initial grids from `gridOption` options are shown below:
 ![](images/exampleOutput/initialGridOptions.png)
 
-
-To create a reef model, the user establishes multiple instances of class `Organism()` with a benthic type (0=coral, 1=turf, 2=macroalgae), a coordinate location, and an ID number. These instances can then be appended to an instance of class `Reef()` as a node attribute, using `append()`. Once all the nodes are appended, the user can run `generateGraph()` to establish which instances of class `Organism()` are considered as neighbors of oneanother (based on a given distance threshold and the previously defined coordinate location). 
-
-An example of this process, the creation of an 10x10 reef with randomly assigned types for the initial nodes, is shown below:
-
+* Grid size and radius of a nodes neighborhood:
 ```python
-    .
-    .
-for s in range(0,NumberOfSimulations):
-    Moorea = Reef()                                                              # <-- Reef()
-    count = 0
-    for i in range(0,length):
-        for j in range(0, width):
-            U = np.random.choice([0,1,2],
-                                 p=[coralPercent, turfPercent, algaePercent])
-            node = Organism(type=U, location=[i,j], ID=count)                    # <-- Organism()
-            Moorea.append(node)                                                  # <-- append()
-            count = count + 1
-    Moorea.generateGraph()                                                       # <-- generateGraph()
-    .
-    .    
-    
+rows=15 
+columns=15
+threshold=1.45
+```
+
+* Time settings:
+```python
+recordRate=90 #frequency of recording output data
+dt=.1 
+tf=50 #time final
+```
+
+* Model Parameters
+```python
+r=1.0
+d=.4 
+a=.2
+g=.4 #array
+y=.75
 ```
 
 
-#### Reef Update
+#### Model Run
 
-Once the graph is generated, the user can run a timestep of the model, i.e. a stochastic update of node types, through `roll()`.
+Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
+Within `coralModelTest.py`, you will find `runModel()` as well as some of the other functions defined in this one:
 
 ```python
 def runModel(simulation):
@@ -128,7 +153,7 @@ def runModel(simulation):
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. 
+As mention, `roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. 
 These reactions emphasize the influence the parameters, pulled from the mumby equations, and species density around each node have on changing a spot on the reef from being one type to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral and density of the two species. Whereas the mumby et al. equations consider the *global* population of coral of the system, we focus on the *local* composition around each node with assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` from class `Organism()`. This value is initially measured with `generateGraph()` and then updated throughout the simulation with `inform()` and `update()`, which are not shown in this introduction but can be found in `coralModel.py`.
 
 The inclusion of the local type density can be seen in the code below, showing how the function `roll()` multiplies each reaction parameter with the density of specific types in the node's neighborhood in calculating the probability of type switching.
@@ -203,7 +228,7 @@ cd coralModel/scripts
 sh coralModel-grazingLoop.sh
 ```
 
-Once the model is done running, you should see a folder titled `output` in the `scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs and Metrics). 
+Once the model is done running, you should see a folder titled `/output` in the `/scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs and Metrics). 
 
 To explore your outputs:
 
@@ -218,7 +243,6 @@ jupyter notebook
 ### References
 
 [1] Mumby, P. J., Hastings, A., & Edwards, H. J. (2007). Thresholds and the resilience of Caribbean coral reefs. Nature, 450(7166), 98–101. https://doi.org/10.1038/nature06252
-
 
 
 
