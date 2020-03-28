@@ -7,7 +7,8 @@ For the purpose of drawing attention to specific parts of the python code throug
      .
      .
 ```
-----              
+---- 
+             
 ## Model Overview
 
 coralModel is a stochastic spatiotemporal model representing the spatiotemporal evolution of three competing coral reef benthic coverages:
@@ -16,7 +17,10 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * Algal turf
 * Macroalgae
 
-The model consists of various nodes, each of which is assigned one of these types of benthic coverage. Over time, The nodes' type update stochastically through probabilities weighted by each node's immediate neighbors' types and overall reef conditions defined through input parameters. 
+The model consists of various nodes, each of which is assigned one of these types of benthic coverage. 
+Over time, a node's type updates stochastically through probabilities weighted by:
+1. Overall reef conditions defined through input parameters, and
+2. The node's immediate neighbors' types.
 
 Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
 
@@ -24,21 +28,22 @@ Below is an example of an 15x15 node reef's composition initially and after 100 
 ![](images/exampleOutput/initialFinal.png)
 
 
-
 ### Model Structure
 
-The weighing is based on Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
+  We derived the rules for our model's dynamics from Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
 
 ![](images/mumbyEquations.png)
 
-From the equations above, we extract a set of 5 different reactions that are possible to occur:
+From the equations above, we extract a set of 5 reactions that describe the probabilities of a the different node types to switch:
 
 ![](images/mumbyAdjusted.png)
 
+We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood densities. In our reactions above, we represent `M`, `T`, `C` as local densities (based on neighborhood benthic compositions) instead of global percentages (reef-wide), which we are only able to do given the spatial explicitness of our model.
 
 
+Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism() `, and appending them to an instance of the class `Reef()`. 
 
-Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`. Their attributes are defined in the `coralModel.py` as follows:
+We define these classes in `coralModel.py` as follows:
 
 ```python
 class Organism():  
@@ -64,6 +69,11 @@ class Reef():
      .
      .
 ```
+
+
+As can be seen above, each `Organism` has a specific type, density (
+
+
 
 #### Model Setup
 
@@ -98,14 +108,22 @@ for s in range(0,NumberOfSimulations):
 
 Once the graph is generated, the user can run a timestep of the model, i.e. a stochastic update of node types, through `roll()`.
 
-```
-    for n in range(0,NumberOfRuns):
-        for i,val in enumerate(Moorea.nodes):
-            types[n,i,s] = Moorea.nodes[i].type
-        coralCount[n,s] = np.count_nonzero(types[n,:,s] == 0)
-        turfCount[n,s] = np.count_nonzero(types[n,:,s] == 1)
-        algaeCount[n,s] = np.count_nonzero(types[n,:,s] == 2)
-        Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)                             # <-- roll()
+
+```python
+def runModel(simulation):
+        
+    Moorea = createReef()
+    Moorea.generateGraph(threshold) 
+    
+    for timestep in range(0,NumberOfTimesteps):
+        if timestep == 0:
+            table = pd.DataFrame([])
+        if timestep % recordRate == 0:
+            table = pd.concat([table, pullInfo(Moorea, simulation, timestep)])
+            
+        Moorea.roll(r=r, d=d, a=a, g=g, y=y, dt=dt)
+        
+    return(table)
     .
     .
 ```
@@ -146,27 +164,26 @@ The inclusion of the local type density can be seen in the code below, showing h
 ```
 
 
-### Outputs and Metrics
+### Outputs
 
-We pull and save the folowing metrics for each model run.
+We pull and save the following metrics, shown in the example output below:
+
+![](images/exampleOutput/table.png)
+
+(Coral-CoralNeighbors represents the average number of coral neighbors for a coral node (same holds for Turf-TurfNeighbors and Macro-MacroNeighbors).) 
 
 
 Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
+
 `output/15x15/grid0/grazing30/coral33-macro33-r10-d40-a20-y75-time5010-rec500-nsim100.csv`
-This translates to:
 
-output/grid size/initial grid option/grazing value(x100 to remove decimals)/
-coral percent, macroalgae percent, inputs r, d, a, y, final time, record rate, and number of simulations
+(i.e. output, rows x columns, initial grid option, grazing value (x100 to remove decimals), 
+coral percent, macroalgae percent, inputs r, d, a, y, final time, record rate, and number of simulations)
 
-You can visualize the output data using `modelOutputViewer.ipynb`. Running the notebook generates the following plots:
+You can visualize the output data using `modelOutputViewer.ipynb`. 
 
- 1. The initial and final spatial configurations of the instance `Reef()`, side-by-side
- 2. The timeseries of each type's count for the 100 runs
- 3. The timeseries for 100 simulations averaged
 
-However, within `coralModelTest.py`, the spatial distribution of the type at each timestep of a simulation is stored and can therefore also be saved and/or plotted. To save this file, uncomment line 61 (#np.savetxt("modelOutput.csv", types, delimiter=",")). This is currently commented out due to the large size of the file that it currently generates.
-
-### Running coralModelTest.py
+### Running coralModelTest.py and Exploring Outputs
 
 To run the `coralModelTest.py`, follow the following instructions:
 
@@ -186,16 +203,15 @@ cd coralModel/scripts
 sh coralModel-grazingLoop.sh
 ```
 
-### Exploring the outputs
+Once the model is done running, you should see a folder titled `output` in the `scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs and Metrics). 
 
-Once the model is done running, you should see a folder titled `output` in the `scripts` folder. In here, you will find all the csv files (described above) organized into folders named after some of the input parameters. To explore your outputs:
+To explore your outputs:
 
 1. Open jupyter notebook (or lab)
 ```
 jupyter notebook 
 ```
 2. Within jupyter, open `modelOutputViewer.ipynb`
-
 
 
 
