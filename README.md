@@ -21,7 +21,7 @@ The model consists of various nodes, each of which is assigned one of these type
 Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
 
 (0=Coral, 1=Turf, 2=Macroalgae).:
-![](images/exampleOutput/InitialFinal.png){:height="80%" width="80%"}
+![](images/exampleOutput/InitialFinal.png =250x500)
 
 
 These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this repository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
