@@ -117,7 +117,7 @@ recordRate=90 #frequency of recording output data
 dt=.1 
 tf=50 #time final
 ```
-* Model Parameters
+* Model parameters:
 ```python
 r=1.0
 d=.4 
@@ -131,7 +131,7 @@ y=.75
 
 Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
-Within `coralModelTest.py`, you will find `runModel()` with creates the reef described in the .sh file and uses `roll()` to update the given reef from the set number of timesteps.
+Within `coralModelTest.py`, you will find `runModel()` whitch creates the reef described in the .sh file and uses `roll()` to update the given reef for the set number of timesteps you set.
 
 ```python
 def runModel(simulation):
@@ -192,7 +192,7 @@ def roll(self, r, d, a, g, y, dt):
 The final outputs from a .sh run are the following metrics, shown in the example output below:
 ![](images/exampleOutput/table.png)
 
-(Coral-CoralNeighbors represents the average number of coral neighbors for a coral node (same holds for Turf-TurfNeighbors and Macro-MacroNeighbors).) 
+Coral-CoralNeighbors represents the average number of coral neighbors for a coral node (similarly holds for Turf-TurfNeighbors and Macro-MacroNeighbors).
 
 These specific values are set to be output in the function `pullInfo()`, shown below, within `coralModelTest.py`: 
 
@@ -215,7 +215,6 @@ def pullInfo(Moorea, simulation, timestep):
 **If you are interested in looking at the spatial evolution explicitly**, return and save the variable `image` listed in the function above.
 
 Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
-
 `output/15x15/grid0/grazing30/coral33-macro33-r10-d40-a20-y75-time5010-rec500-nsim100.csv`
 
 (i.e. output, rows x columns, initial grid option, grazing value (x100 to remove decimals), 
@@ -244,7 +243,6 @@ cd coralModel/scripts
 ```
 sh coralModel-grazingLoop.sh
 ```
-
 Once the model is done running, you should see a folder titled `/output` in the `/scripts` folder. In here, you will find all the csv files (described above in Outputs and Metrics) organized into folders (mentioned above in Outputs and Metrics). 
 
 To explore your outputs:
@@ -256,6 +254,7 @@ jupyter notebook
 2. Within jupyter, open `modelOutputViewer.ipynb`
 
 
+Enjoy!
 
 ## References
 
