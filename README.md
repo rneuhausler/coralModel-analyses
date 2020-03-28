@@ -82,8 +82,8 @@ class Reef():
 
 As can be seen above, each `Organism` carries the knowledge of:
 
-1. It's specific type: 0 for Coral, 1 for Turf, 2 for Macroalgae .
-2. The neighborhood density: an array of length three, containing the number of each benthic type represented in the set of neighboring nodes (indexed by the type value from 1.).
+1. Its specific type: 0 for Coral, 1 for Turf, 2 for Macroalgae .
+2. The neighborhood density: an 3-dimensional vector, containing the number of each benthic type represented in the set of neighboring nodes (indexed by the type value from 1.).
 3. Location: a 2 dimensional coordinate location of that node, used in determining neighboring nodes.
 
 
