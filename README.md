@@ -23,10 +23,10 @@ Over time, a node's type updates stochastically through probabilities weighted b
 2. The node's immediate neighbors' types.
 
 Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
+(0=Coral, 1=Turf, 2=Macroalgae):
 
-(0=Coral, 1=Turf, 2=Macroalgae).:
 
-![](images/exampleOutput/initialFinal.png)
+![](images/exampleOutput/InitialFinal.png)
 
 
 ### Model Structure
@@ -85,7 +85,7 @@ The purpose in all of this is to be able to run the function `roll()`. With this
 This GitHub repository contains various python and shell scripts that allow for the user to create a reef, and take it through a set number of time steps using `roll()`. The potential initial reef setups and model variabilities are described next.   
 
 
-#### Model Setup
+### Model Setup
 
 In this repository, within `/scripts`, you will find a shell script called `coralModel.sh`. Within this file you will the option to adjust the following (comments not included in the file):
 
@@ -102,6 +102,7 @@ gridOption=0 ## grid options 0=random,1=checkered,2=with blob of one type in cen
 blobValue=0 ## only used is gridOption=2
 ``` 
 The resultant initial grids from `gridOption` options are shown below:
+
 ![](images/exampleOutput/initialGridOptions.png)
 
 * Grid size and radius of a nodes neighborhood:
@@ -128,7 +129,7 @@ y=.75
 ```
 
 
-#### Model Run
+### Model Run
 
 Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
@@ -189,7 +190,7 @@ The inclusion of the local type density can be seen in the code below, showing h
 ```
 
 
-### Outputs
+## Outputs
 
 We pull and save the following metrics, shown in the example output below:
 
@@ -208,7 +209,7 @@ coral percent, macroalgae percent, inputs r, d, a, y, final time, record rate, a
 You can visualize the output data using `modelOutputViewer.ipynb`. 
 
 
-### Running coralModelTest.py and Exploring Outputs
+## Running coralModelTest.py and Exploring Outputs
 
 To run the `coralModelTest.py`, follow the following instructions:
 
@@ -240,7 +241,7 @@ jupyter notebook
 
 
 
-### References
+## References
 
 [1] Mumby, P. J., Hastings, A., & Edwards, H. J. (2007). Thresholds and the resilience of Caribbean coral reefs. Nature, 450(7166), 98–101. https://doi.org/10.1038/nature06252
 
