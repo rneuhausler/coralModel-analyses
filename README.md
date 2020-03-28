@@ -18,10 +18,10 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 
 The model consists of various nodes, each of which is assigned one of these types of benthic coverage. Over time, The nodes' type update stochastically through probabilities weighted by each node's immediate neighbors' types and overall reef conditions defined through input parameters. 
 
-Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) (0=Coral, 1=Turf, 2=Macroalgae).:
+Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
 
-
-![](images/exampleOutput/InitialFinal.png)
+(0=Coral, 1=Turf, 2=Macroalgae).:
+![](images/exampleOutput/InitialFinal.png){:height="80%" width="80%"}
 
 
 These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this repository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
