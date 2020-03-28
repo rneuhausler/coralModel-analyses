@@ -21,7 +21,7 @@ The model consists of various nodes, each of which is assigned one of these type
 Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
 
 (0=Coral, 1=Turf, 2=Macroalgae).:
-![](images/exampleOutput/InitialFinal.png)
+![](images/exampleOutput/initialFinal.png)
 
 
 
