@@ -92,7 +92,7 @@ In this repository, within `/scripts`, you will find a shell script called `cora
 * The number of cores used to run model simulations in parallel on:
 ```python
 nProcessors=4
-NumberOfSimulations=10
+numberOfSimulations=10
 ```
 * The initial grid setup:
 ```python
@@ -133,7 +133,7 @@ y=.75
 
 Using the values set above, `coralModel.sh` calls `coralModelTest.py`.
 
-Within `coralModelTest.py`, you will find `runModel()` as well as some of the other functions defined in this one:
+Within `coralModelTest.py`, you will find `runModel()` with creates the reef described in the .sh file and uses `roll()` to update the given reef from the set number of timesteps.
 
 ```python
 def runModel(simulation):
@@ -155,49 +155,66 @@ def runModel(simulation):
 ```
 
 As mention, `roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. 
-These reactions emphasize the influence the parameters, pulled from the mumby equations, and species density around each node have on changing a spot on the reef from being one type to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral and density of the two species. Whereas the mumby et al. equations consider the *global* population of coral of the system, we focus on the *local* composition around each node with assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` from class `Organism()`. This value is initially measured with `generateGraph()` and then updated throughout the simulation with `inform()` and `update()`, which are not shown in this introduction but can be found in `coralModel.py`.
 
 The inclusion of the local type density can be seen in the code below, showing how the function `roll()` multiplies each reaction parameter with the density of specific types in the node's neighborhood in calculating the probability of type switching.
 
 ```python
 
-    def roll(self, r, d, a, g, y, dt):
+def roll(self, r, d, a, g, y, dt):
+        
         for i, val in enumerate(self.nodes):      
             U = random.uniform(0,1)
             totalDensity = self.nodes[i].density.sum()
             coralDensity = self.nodes[i].density[0]/totalDensity
             turfDensity = self.nodes[i].density[1]/totalDensity
             algaeDensity = self.nodes[i].density[2]/totalDensity
-            
+
             if self.nodes[i].type == 0:   
-                if U <  (d * (1+coralDensity)) * dt:                    # <-- reaction parameter * density
+                
+                if U <  (d / (1+coralDensity)) * dt:
+                
                     self.nodes[i].type = 1
                     self.inform(initial = 0, final = 1, nodeID = i)
-                elif U < (a * (1+algaeDensity) * (1+turfDensity) + 
-                          d * (1+coralDensity)) * dt:
+
+                elif U < (a * algaeDensity +
+                          d / (1+coralDensity)) * dt:
+
                     self.nodes[i].type = 2
                     self.inform(initial = 0, final = 2, nodeID = i)
 
             elif self.nodes[i].type == 1:
-                if U > 1 - (r * (1+coralDensity) * (1+turfDensity)) * dt:
-                    self.nodes[i].type = 0
-                    self.inform(initial = 1, final = 0, nodeID = i)
-    .
-    .
-            elif self.nodes[i].type == 2:
+                
+                if U < (r * coralDensity) * dt:
     .
     .
 ```
 
-
 ## Outputs
 
-We pull and save the following metrics, shown in the example output below:
-
+The final outputs from a .sh run are the following metrics, shown in the example output below:
 ![](images/exampleOutput/table.png)
 
 (Coral-CoralNeighbors represents the average number of coral neighbors for a coral node (same holds for Turf-TurfNeighbors and Macro-MacroNeighbors).) 
 
+These specific values are set to be output in the function `pullInfo()`, shown below, within `coralModelTest.py`: 
+
+```python
+def pullInfo(Moorea, simulation, timestep):
+    image = np.array([Moorea.nodes[n].type
+                      for n,val in enumerate(Moorea.nodes)])
+    C = np.count_nonzero(image==0)
+    CN = round(tl.densityExtract(Moorea, int(0), C), 2)
+    T = np.count_nonzero(image==1)
+    TN = round(tl.densityExtract(Moorea, int(1), T), 2)
+    M = np.count_nonzero(image==2)
+    MN = round(tl.densityExtract(Moorea, int(2), M), 2)
+    CP, AP, TP, MP = tl.patchCounts(image, rows)
+    data = [simulation, timestep, C, T, M, CN, TN, MN, CP, AP, TP, MP]  
+    dataframe = pd.DataFrame([data])
+    return(dataframe)
+```
+
+**If you are interested in looking at the spatial evolution explicitly**, return and save the variable "image".
 
 Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
 
