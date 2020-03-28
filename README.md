@@ -24,8 +24,6 @@ Below is an example of an 15x15 node reef's composition initially and after 100 
 ![](images/exampleOutput/InitialFinal.png)
 
 
-These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this repository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
-
 
 ### Model Structure
 
@@ -67,7 +65,10 @@ class Reef():
      .
 ```
 
-#### Creating the Reef
+#### Model Setup
+
+![](images/exampleOutput/initialGridOptions.png)
+
 
 To create a reef model, the user establishes multiple instances of class `Organism()` with a benthic type (0=coral, 1=turf, 2=macroalgae), a coordinate location, and an ID number. These instances can then be appended to an instance of class `Reef()` as a node attribute, using `append()`. Once all the nodes are appended, the user can run `generateGraph()` to establish which instances of class `Organism()` are considered as neighbors of oneanother (based on a given distance threshold and the previously defined coordinate location). 
 
