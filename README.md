@@ -8,7 +8,7 @@ For the purpose of drawing attention to specific parts of the python code throug
      .
 ```
 ----              
-## Overview
+## Model Overview
 
 coralModel is a stochastic spatiotemporal model representing the spatiotemporal evolution of three competing coral reef benthic coverages:
 
@@ -16,11 +16,12 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * Algal turf
 * Macroalgae
 
-The model consists of various nodes, each of which is assigned one of these types of benthic coverage. The node's type then updates stochastically through probabilities weighted by neighboring types and overall reef conditions defined through input parameters.
+The model consists of various nodes, each of which is assigned one of these types of benthic coverage. Over time, The nodes' type update stochastically through probabilities weighted by each node's immediate neighbors' types and overall reef conditions defined through input parameters. 
 
-Below is an example of an 10x10 node reef's composition initially and after 100 runs (updates), as well as the total count of each type over time (0=Coral, 1=Turf, 2=Macroalgae).:
+Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) (0=Coral, 1=Turf, 2=Macroalgae).:
 
-![](images/exampleOutput/combined.png)
+
+![](images/exampleOutput/InitialFinal.png)
 
 
 These plots were generated using `coralModelTest.py` and `coralModel.py`. Both of these files are found in this repository under "scripts". The first file is an example script of how to use the classes defined in the latter one to create your own reef model.
@@ -28,7 +29,18 @@ These plots were generated using `coralModelTest.py` and `coralModel.py`. Both o
 
 ### Model Structure
 
-Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`. Their attributed are defined in the `coralModel.py` as follows:
+The weighing is based on Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
+
+![](images/mumbyEquations.png)
+
+From the equations above, we extract a set of 5 different reactions that are possible to occur:
+
+![](images/mumbyAdjusted.png)
+
+
+
+
+Benthic coverages are abstracted as instances of the class `Organism() `, which are appended to the an instance of the class `Reef()`. Their attributes are defined in the `coralModel.py` as follows:
 
 ```python
 class Organism():  
@@ -97,14 +109,7 @@ Once the graph is generated, the user can run a timestep of the model, i.e. a st
     .
 ```
 
-`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. The weighing is based on Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
-
-![](images/mumbyEquations.png)
-
-From the equations above, we extract a set of 5 different reactions that are possible to occur:
-
-![](images/mumbyAdjusted.png)
-
+`roll()` updates each node (i.e. instance of class `Organism()` within class `Reef()`) based a probability weighted by neighboring benthic coverages, determined by `generateGraph()`, and overall reef conditions, and a randomly generated number. If the randomly generated number falls within the bounds of the weighted probability, the node switches to a different type. 
 These reactions emphasize the influence the parameters, pulled from the mumby equations, and species density around each node have on changing a spot on the reef from being one type to the other (e.g. the first reaction describes a coral (node) becoming macroalgae at the growth rate of macroalgae over coral and density of the two species. Whereas the mumby et al. equations consider the *global* population of coral of the system, we focus on the *local* composition around each node with assumptions such that if there is a macroalgae right next to the coral, that coral is more likely to switch to macroalgae than if it were surrounded by only other coral. This neighborhood information is stored within each node as the attribute `density` from class `Organism()`. This value is initially measured with `generateGraph()` and then updated throughout the simulation with `inform()` and `update()`, which are not shown in this introduction but can be found in `coralModel.py`.
 
 The inclusion of the local type density can be seen in the code below, showing how the function `roll()` multiplies each reaction parameter with the density of specific types in the node's neighborhood in calculating the probability of type switching.
@@ -177,7 +182,7 @@ cd coralModel/scripts
 ```
 4. Run the model
 ```
-sh coralModel.sh
+sh coralModel-grazingLoop.sh
 ```
 
 ### Exploring the outputs
