@@ -31,7 +31,7 @@ Below is an example of an 15x15 node reef's composition initially and after 100 
 
 ### Model Structure
 
-  We derived the rules for our model's dynamics from Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
+We derived the rules for our model's dynamics from Mumby et al. (2007)'s reef competition ODE's, shown below [1]:
 
 ![](images/mumbyEquations.png)
 
@@ -111,20 +111,18 @@ rows=15
 columns=15
 threshold=1.45
 ```
-
 * Time settings:
 ```python
 recordRate=90 #frequency of recording output data
 dt=.1 
 tf=50 #time final
 ```
-
 * Model Parameters
 ```python
 r=1.0
 d=.4 
 a=.2
-g=.4 #array
+g=.4
 y=.75
 ```
 
@@ -214,7 +212,7 @@ def pullInfo(Moorea, simulation, timestep):
     return(dataframe)
 ```
 
-**If you are interested in looking at the spatial evolution explicitly**, return and save the variable "image".
+**If you are interested in looking at the spatial evolution explicitly**, return and save the variable `image` listed in the function above.
 
 Currently, `coralModel.sh` creates a folder network to organized model outputs based on the inputs, as seen below:
 
@@ -222,6 +220,7 @@ Currently, `coralModel.sh` creates a folder network to organized model outputs b
 
 (i.e. output, rows x columns, initial grid option, grazing value (x100 to remove decimals), 
 coral percent, macroalgae percent, inputs r, d, a, y, final time, record rate, and number of simulations)
+
 
 You can visualize the output data using `modelOutputViewer.ipynb`. 
 
