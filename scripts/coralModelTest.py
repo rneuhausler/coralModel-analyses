@@ -28,8 +28,7 @@ if gridOption == 1:
     checkerBoard = tl.generateCheckerBoard(rows, columns)
 elif gridOption == 2:
     blobLocations, notBlob = tl.generateBlob(coralPercent,
-                                              blobValue =
-                                              int(sys.argv[18])) 
+                                              blobValue = int(sys.argv[17])) 
 ##  Functions
 
 def createReef():

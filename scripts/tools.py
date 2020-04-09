@@ -18,7 +18,7 @@ def generateCheckerBoard(rows, columns):
     return(checkerBoard)
 
 def generateBlob(blobPercent, blobValue):
-    blobValue = int(sys.argv[18])
+    blobValue = blobValue
     notBlob = [a for a in [0,1,2] if a != blobValue]   
     center = (rows/2, columns/2)
     distanceGrid = np.array([Reef.distance([i+.5,j+.5], center)
