@@ -8,7 +8,7 @@ import re
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 from ripser import ripser, lower_star_img
 from persim import plot_diagrams
-
+from coralModel import Reef
 
 def generateCheckerBoard(rows, columns):
     m = rows + 2
@@ -17,8 +17,7 @@ def generateCheckerBoard(rows, columns):
                            ((m+2)//3, (n+2)//3))
     return(checkerBoard)
 
-def generateBlob(blobPercent, blobValue):
-    blobValue = blobValue
+def generateBlob(blobPercent, blobValue, rows, columns, NumberOfNodes):
     notBlob = [a for a in [0,1,2] if a != blobValue]   
     center = (rows/2, columns/2)
     distanceGrid = np.array([Reef.distance([i+.5,j+.5], center)

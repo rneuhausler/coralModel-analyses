@@ -27,8 +27,9 @@ turfPercent = 1 - coralPercent - algaePercent
 if gridOption == 1:
     checkerBoard = tl.generateCheckerBoard(rows, columns)
 elif gridOption == 2:
-    blobLocations, notBlob = tl.generateBlob(coralPercent,
-                                              blobValue = int(sys.argv[17])) 
+    blobValue = int(sys.argv[17])
+    blobLocations, notBlob = tl.generateBlob(coralPercent, blobValue,
+                                             rows, columns, NumberOfNodes) 
 ##  Functions
 
 def createReef():
