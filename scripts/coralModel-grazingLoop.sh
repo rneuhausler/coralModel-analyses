@@ -1,5 +1,5 @@
 
-for VARIABLE in .3 .4 .5 .6 .7 .8
+for VARIABLE in .3 .4 .5 .6 .7
 do
 
 # Inputs
@@ -15,7 +15,7 @@ do
     columns=15
     threshold=1.45 
 
-    recordRate=500
+    recordRate=200
 
 #loop through g
     r=1.0
