@@ -10,6 +10,11 @@ from ripser import ripser, lower_star_img
 from persim import plot_diagrams
 from coralModel import Reef
 
+## For Model Runs
+
+#Model Setup
+
+
 def generateCheckerBoard(rows, columns):
     m = rows + 2
     n = columns + 2
@@ -29,6 +34,7 @@ def generateBlob(blobPercent, blobValue, rows, columns, NumberOfNodes):
                      for n in range(0,len(blobLocations[0]))]
     return(blobLocations, notBlob)
 
+#Data Pulling
 
 def densityExtract(Moorea, Type, Count):
     if Count == 0:
@@ -88,6 +94,110 @@ def pandasHistogram(dataframe, variable, by):
                           layout=(3,1), sharex=True, sharey=True)
     return(test)
 
+
+## For Model Analysis
+
+def viewRuns(topDirectory):
+    
+    ## Get path + name for all csvs within top directory
+    files = [path+'/'+file for path, d, f in os.walk(topDirectory) for file in f if
+             file.endswith(".csv")]
+
+    ## Pull parameter information from path + name 
+    overviewOfRuns = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
+
+    ## Assign column names + create file index 
+    overviewOfRuns.columns = ['Rows', 'Columns', 'Grid Option', 'Grazing', 'Initial Coral Percent', 'Initial Macroalgae Percent', 'r', 'd', 'a', 'y', 'Time', 'Record Rate', 'Number of Simulations']
+                                
+    overviewOfRuns = overviewOfRuns.set_index([pd.Series([n for n in range(0,len(files))])])
+    overviewOfRuns['File']=overviewOfRuns.index
+    
+    return(files, overviewOfRuns)
+
+def loadRuns(files, subset):
+    
+    #subset = needs to be a subset of viewRuns, output 
+    simulationData = pd.concat([pd.DataFrame(pd.read_csv(
+        files[f])).assign(File = np.repeat(f, len(pd.read_csv(files[f])))) for f in list(subset.index)])
+    dataframe = pd.merge(simulationData, subset, on='File')
+                                
+    return(dataframe)
+    
+def addPercent(df):
+    
+    df['CoralPercent'] = df['CoralCount']/(df['Rows']*df['Columns']) * 100
+    df['TurfPercent'] = df['TurfCount']/(df['Rows']*df['Columns']) * 100
+    df['MacroalgaePercent'] = df['MacroalgaeCount']/(df['Rows']*df['Columns']) * 100
+    
+    return(df)
+
+
+def labelCrashStatistics(df, coralSuccess):
+    
+    timestep = df['Timestep'].max()
+    
+    df['coralSuccess'] = -999
+    
+    df.loc[(df['Timestep']==timestep) & (df['CoralPercent'] > coralSuccess), 'coralSuccess'] = 1
+    df.loc[(df['Timestep']==timestep) & (df['CoralPercent'] < coralSuccess), 'coralSuccess'] = 0
+    df.loc[(df['Timestep']==timestep) & (df['CoralPercent'] == 0), 'coralSuccess'] = -1
+    
+    df.loc[:,'coralSuccess'] = df.groupby(['File','Simulation'])['coralSuccess'].transform('max')
+    
+    return(df)
+
+def scaledByNumberOfNodes(df):
+    
+    df['CoralPatchCount_Scaled'] = df['CoralPatchCount']/df['CoralCount']               
+    df['TurfPatchCount_Scaled'] = df['TurfPatchCount']/df['TurfCount']   
+    df['MacroPatchCount_Scaled'] = df['MacroPatchCount']/df['MacroalgaeCount']
+    df['AlgaePatchCount_Scaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount']+df['TurfCount'])
+    df['AlgaePatchCount_MScaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount'])
+    df['AlgaePatchCount_TScaled'] = df['AlgaePatchCount']/(df['TurfCount'])
+
+
+  
+    df['CoralNeighbors_Scaled'] = df['Coral-CoralNeighbors']/df['CoralCount']
+    df['TurfNeighbors_Scaled'] = df['Turf-TurfNeighbors']/df['TurfCount']
+    df['MacroNeighbors_Scaled'] = df['Macro-MacroNeighbors']/df['MacroalgaeCount']
+    
+    return(df.replace(np.inf, 0))
+
+def normalize(df):
+
+    df_n=(df-df.min())/(df.max()-df.min())
+    df['coral_neighbors']=df_n['Coral-CoralNeighbors']
+    df['turf_neighbors']=df_n['Turf-TurfNeighbors']
+    df['macroalgae_neighbors']=df_n['Macro-MacroNeighbors']
+
+    df['coral_neighbors_scaled']=df_n['CoralNeighbors_Scaled']
+    df['turf_neighbors_scaled']=df_n['TurfNeighbors_Scaled']
+    df['macroalgae_neighbors_scaled']=df_n['MacroNeighbors_Scaled']
+
+    df['turf_percent']=df_n['TurfPercent']
+    df['macroalgae_percent']=df_n['MacroalgaePercent']
+    df['coral_percent']=df_n['CoralPercent']
+
+
+    df['coral_patches']=df_n['CoralPatchCount']
+    df['turf_patches']=df_n['TurfPatchCount']
+    df['macroalgae_patches']=df_n['MacroPatchCount']
+    df['patches_algae']=df_n['AlgaePatchCount']
+    
+    return(df)
+
+def lag(df, columnName, shiftValue):
+    recordRate = df['Record Rate'][0]
+    df[columnName+'_lag'+str(shiftValue*recordRate)] = df.groupby(
+        ['File','Simulation'])[columnName].shift(shiftValue)
+    return(df)
+
+def addLag(df, lagColumnNames, shiftValues):
+    for columnName in lagColumnNames:
+        for shiftValue in shiftValues:
+            df = lag(df, columnName, shiftValue)
+    return(df)
+                   
 
 
 '''
