@@ -12,6 +12,7 @@ columns=15
 threshold=1.45 
 
 recordRate=90
+imageReturn=true
 
     ## table for first run. later averages
 #loop through g, nested loop through gridoption (once ready)
@@ -27,10 +28,10 @@ blobValue=0
 
 ## create directory
 grazingFolder=$(python -c "print(int($g*100))")
-mkdir -p 'output'/$rows'x'$columns/'grid'$gridOption/'grazing'$grazingFolder
+mkdir -p 'output'/$rows'x'$columns/'grid'$gridOption/'grazing'$grazingFolder/'images'
 
 ## run simulation
-python coralModelTest.py $nProcessors $NumberOfSimulations $coralPercent $algaePercent $gridOption $rows $columns $threshold $recordRate $r $d $a $g $y $dt $tf $blobValue
+python coralModel_functions.py $nProcessors $NumberOfSimulations $coralPercent $algaePercent $gridOption $rows $columns $threshold $recordRate $imageReturn $r $d $a $g $y $dt $tf $blobValue
 
 
 
