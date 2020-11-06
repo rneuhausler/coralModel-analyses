@@ -244,6 +244,8 @@ def add_crash_time(df):
 
     df.loc[dfcrash['Coral Success'] != -1, 'Time To Crash'] = -100
 
+    return(df)
+
 # for new names including "threshold"
 
 def viewRuns2(topDirectory):
