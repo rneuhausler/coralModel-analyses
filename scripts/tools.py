@@ -14,29 +14,28 @@ from coralModel import Reef
 
 #Model Setup
 
-
-def generate_checker_board(rows, columns):
-    m = rows + 2
-    n = columns + 2
+def generate_checker_board(number_of_rows, number_of_columns):
+    m = number_of_rows + 2
+    n = number_of_columns + 2
     checker_board = np.tile(np.array([[0,1,2],[1,2,0],[2,0,1]]),
                            ((m+2)//3, (n+2)//3))
     return(checker_board)
 
-def generate_blob(blob_percent, blob_value, rows, columns, number_of_nodes):
+def generate_blob(blob_percent, blob_value, number_of_rows, number_of_columns, number_of_nodes):
     not_blob = [a for a in [0,1,2] if a != blob_value]
-    center = (rows/2, columns/2)
+    center = (number_of_rows/2, number_of_columns/2)
     distance_grid = np.array([Reef.distance([i+.5,j+.5], center)
-                             for i in range(0,rows)
-                             for j in range(0,columns)])
+                             for i in range(0,number_of_rows)
+                             for j in range(0,number_of_columns)])
     max_distance = np.sort(distance_grid)[round(blob_percent * number_of_nodes)]
-    blob_locations = (np.where(distance_grid.reshape(rows, columns) < max_distance))
+    blob_locations = (np.where(distance_grid.reshape(number_of_rows, number_of_columns) < max_distance))
     blob_locations = [(blob_locations[0][n],blob_locations[1][n])
                      for n in range(0,len(blob_locations[0]))]
     return(blob_locations, not_blob)
 
 #Data Pulling
 
-def density_extract(Moorea, node, count):
+def extract_neighbors(Moorea, node, count):
     if count == 0:
         neighbors = 0
     else:
@@ -46,7 +45,7 @@ def density_extract(Moorea, node, count):
                               if Moorea.nodes[n].type == node]).mean(axis=0)
     return(neighbors)
 
-def density_extract_specific(Moorea, node_type, neighbor_type, count):
+def extract_neighbors_specific(Moorea, node_type, neighbor_type, count):
     if Count == 0:
         neighbors = 0
     else:
@@ -57,11 +56,11 @@ def density_extract_specific(Moorea, node_type, neighbor_type, count):
     return(neighbors)
 
 
-def shaper(df, rows):
-    df = np.reshape(df, (-1, rows))
+def shaper(df, number_of_rows):
+    df = np.reshape(df, (-1, number_of_rows))
     return(df)
 
-def binary(df,ones='coral'):
+def binary(df, ones='coral'):
     with np.errstate(divide='ignore',invalid='ignore'):
         if ones == 'coral':
             df = np.nan_to_num(df/df)
@@ -71,32 +70,29 @@ def binary(df,ones='coral'):
             df = np.nan_to_num((df-2)**2/(df-2)**2)
     return(df)
 
-def tda_prep(df, rows, ones='coral'):
+def tda_prep(df, number_of_rows, ones='coral'):
     df = binary(df,ones)
     dfi = 1-df
-    df = shaper(df,rows)
-    dfi = shaper(dfi,rows)
+    df = shaper(df,number_of_rows)
+    dfi = shaper(dfi,number_of_rows)
     return(df, dfi)
 
-def patch_counts(sim, rows):
+def patch_counts(image, number_of_rows):
 
-# TDA measure for coral:
+    # TDA measure for coral:
+    df, dfi = tda_prep(image, number_of_rows, ones='coral')
+    coral_patches = len(lower_star_img(df))
+    algae_patches = len(lower_star_img(dfi))
 
-    df, dfi = tda_prep(sim, rows, ones='coral')
-    count_coral_patches = len(lower_star_img(df))
-    count_algae_patches = len(lower_star_img(dfi))
+    # TDA meaure for turf:
+    df, dfi = tda_prep(image, number_of_rows, ones='turf')
+    turf_patches = len(lower_star_img(df))
 
-# TDA meaure for turf:
+    # TDA measure for macroalgae:
+    df, dfi = tda_prep(image, number_of_rows, ones='macro')
+    macro_patches = len(lower_star_img(df))
 
-    df, dfi = tda_prep(sim, rows, ones='turf')
-    count_turf_patches = len(lower_star_img(df))
-
-# TDA measure for macroalgae:
-
-    df, dfi = tda_prep(sim, rows, ones='macro')
-    count_macro_patches = len(lower_star_img(df))
-
-    return(count_coral_patches, count_algae_patches, count_turf_patches, count_macro_patches)
+    return(coral_patches, algae_patches, turf_patches, macro_patches)
 
 def pandas_histogram(dataframe, variable, by):
     test = dataframe.hist(column=variable,
@@ -114,10 +110,14 @@ def view_runs(top_directory):
              file in f if file.endswith(".csv") and path.find('images') == -1]
 
     ## Pull parameter information from path + name
-    overview_of_runs = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
+    overview_of_runs = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',
+                                  files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
 
     ## Assign column names + create file index
-    overview_of_runs.columns = ['Rows', 'Columns', 'Grid Option', 'Grazing', 'Initial Coral Percent', 'Initial Macroalgae Percent', 'r', 'd', 'a', 'y', 'Time', 'Record Rate', 'Number of Simulations']
+    overview_of_runs.columns = ['number_of_rows', 'number_of_columns', 'grid_option',
+                                'grazing', 'neighborhood_threshold', 'initial_coral_percent',
+                                'initial_macroalgae_percent', 'r', 'd', 'a', 'y',
+                                'number_of_timesteps', 'record_rate', 'number_of_simulations']
 
     overview_of_runs = overview_of_runs.set_index([pd.Series([n for n in range(0,len(files))])])
     overview_of_runs['File']=overview_of_runs.index
@@ -127,19 +127,24 @@ def view_runs(top_directory):
 def view_images(top_directory, overview_of_runs):
 
     ## Get path + name for all csvs within top directory
-    files = [path+'/'+file for path, d, f in os.walk(top_directory) for file in f if file.endswith(".csv") and path.find('images') != -1]
+    files = [path+'/'+file for path, d, f in os.walk(top_directory) for file
+             in f if file.endswith(".csv") and path.find('images') != -1]
 
     ## Pull parameter information from path + name
-    overview_of_images = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
+    overview_of_images = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',
+                                                           files[n])[1:-1], dtype='int')])
+                                                           for n in range(0,len(files))])
 
     ## Assign column names + create file index
-    overview_of_images.columns = ['Rows', 'Columns', 'Grid Option', 'Grazing',
-                                  'Simulation', 'Timestep','Initial Coral Percent',
-                                  'Initial Macroalgae Percent', 'r', 'd', 'a', 'y',
-                                  'Time', 'Record Rate', 'Number of Simulations']
+    overview_of_images.number_of_columns = ['number_of_rows', 'number_of_columns',
+                                            'grid_option', 'grazing',
+                                            'neighborhood_threshold', 'initial_coral_percent',
+                                            'initial_macroalgae_percent', 'r',
+                                            'd', 'a', 'y', 'number_of_timesteps',
+                                            'record_rate', 'number_of_simulations']
 
     overview_of_images = overview_of_images.set_index([pd.Series([n for n in range(0,len(files))])])
-    overview_of_images['Image File']=overview_of_images.index
+    overview_of_images['image_file']=overview_of_images.index
 
     overview_of_images = pd.merge(overview_of_images, overview_of_runs)
 
@@ -154,97 +159,94 @@ def load_runs(files, subset):
 
     return(dataframe)
 
+def split_neighbors(df):
+    ##    df['Coral-CoralNeighbors'] = split[0].replace('', '0').astype(float).replace(np.inf, 0).dropna().astype(int)
+
+    split = df['coral_neighbors'].str.replace('[', '').str.replace(']', '').str.replace('[ ]{2,}', ' ').str.split(" ", n = 2, expand = True)
+
+    df['coral_coral_neighbors'] = split[0].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['coral_turf_neighbors'] = split[1].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['coral_macro_neighbors'] = split[2].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+
+    split = df['turf_neighbors'].str.replace('[', '').str.replace(']', '').str.replace('[ ]{2,}', ' ').str.split(" ", n = 2, expand = True)
+
+    df['turf_coral_neighbors'] = split[0].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['turf_turf_neighbors'] = split[1].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['turf_macro_neighbors'] = split[2].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+
+    split = df['macroalgae_neighbors'].str.replace('[', '').str.replace(']', '').str.replace('[ ]{2,}', ' ').str.split(" ", n = 2, expand = True)
+
+    df['macro_coral_neighbors'] = split[0].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['macro_turf_neighbors'] = split[1].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+    df['macro_macro_neighbors'] = split[2].replace('', '0').astype(float).replace(np.inf, 0).dropna()
+
+    return(df.drop(['coral_neighbors', 'turf_neighbors', 'macroalgae_neighbors'],axis=1))
+
 def add_percent(df):
 
-    df['CoralPercent'] = df['CoralCount']/(df['Rows']*df['Columns']) * 100
-    df['TurfPercent'] = df['TurfCount']/(df['Rows']*df['Columns']) * 100
-    df['MacroalgaePercent'] = df['MacroalgaeCount']/(df['Rows']*df['Columns']) * 100
+    df['coral_percent'] = df['coral_count']/(df['number_of_rows']*df['number_of_columns']) * 100
+    df['turf_percent'] = df['turf_count']/(df['number_of_rows']*df['number_of_columns']) * 100
+    df['macroalgae_percent'] = df['macroalgae_count']/(df['number_of_rows']*df['number_of_columns']) * 100
 
     return(df)
-
 
 def label_crash_statistics(df, coral_success):
 
-    timestep = df['Timestep'].max()
+    timestep = df['timestep'].max()
 
-    df['Coral Success'] = -999
+    df['coral_success'] = -999
 
-    df.loc[(df['Timestep']==timestep) & (df['Coral Percent'] > coral_success), 'Coral Success'] = 1
-    df.loc[(df['Timestep']==timestep) & (df['Coral Percent'] < coral_success), 'Coral Success'] = 0
-    df.loc[(df['Timestep']==timestep) & (df['Coral Percent'] == 0), 'Coral Success'] = -1
+    df.loc[(df['timestep']==timestep) & (df['coral_percent'] > coral_success), 'coral_success'] = 1
+    df.loc[(df['timestep']==timestep) & (df['coral_percent'] < coral_success), 'coral_success'] = 0
+    df.loc[(df['timestep']==timestep) & (df['coral_percent'] == 0), 'coral_success'] = -1
 
-    df.loc[:,'Coral Success'] = df.groupby(['File','Simulation'])['Coral Success'].transform('max')
+    df.loc[:,'coral_success'] = df.groupby(['file','simulation'])['coral_success'].transform('max')
 
     return(df)
 
-def scaled_by_number_of_nodes(df):
-
-    df['CoralPatchCount_Scaled'] = df['CoralPatchCount']/df['CoralCount']
-    df['TurfPatchCount_Scaled'] = df['TurfPatchCount']/df['TurfCount']
-    df['MacroPatchCount_Scaled'] = df['MacroPatchCount']/df['MacroalgaeCount']
-    df['AlgaePatchCount_Scaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount']+df['TurfCount'])
-    df['AlgaePatchCount_MScaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount'])
-    df['AlgaePatchCount_TScaled'] = df['AlgaePatchCount']/(df['TurfCount'])
-
-    df['CoralNeighbors_Scaled'] = df['Coral-CoralNeighbors']/df['CoralCount']
-    df['TurfNeighbors_Scaled'] = df['Turf-TurfNeighbors']/df['TurfCount']
-    df['MacroNeighbors_Scaled'] = df['Macro-MacroNeighbors']/df['MacroalgaeCount']
-
-    return(df.replace(np.inf, 0))
 
 def normalize(df):
 
     df_n=(df-df.min())/(df.max()-df.min())
-    df['coral_coral_neighbors']=df_n['Coral-CoralNeighbors']
-    df['coral_turf_neighbors']=df_n['Coral-TurfNeighbors']
-    df['coral_macroalgae_neighbors']=df_n['Coral-MacroNeighbors']
 
-    df['turf_coral_neighbors']=df_n['Turf-CoralNeighbors']
-    df['turf_turf_neighbors']=df_n['Turf-TurfNeighbors']
-    df['turf_macroalgae_neighbors']=df_n['Turf-MacroNeighbors']
-
-    df['macro_coral_neighbors']=df_n['Macro-CoralNeighbors']
-    df['macro_turf_neighbors']=df_n['Macro-TurfNeighbors']
-    df['macro_macroalgae_neighbors']=df_n['Macro-MacroNeighbors']
-
-    df['turf_percent']=df_n['TurfPercent']
-    df['macroalgae_percent']=df_n['MacroalgaePercent']
-    df['coral_percent']=df_n['CoralPercent']
-
-    df['coral_patches']=df_n['CoralPatchCount']
-    df['turf_patches']=df_n['TurfPatchCount']
-    df['macroalgae_patches']=df_n['MacroPatchCount']
-    df['patches_algae']=df_n['AlgaePatchCount']
-
-    return(df)
+    return(df_n)
 
 def lag(df, column_name, shift_value):
-    record_rate = df['Record Rate'][0]
+
+    record_rate = df['record_rate'][0]
     df[column_name+'_lag'+str(shift_value*record_rate)] = df.groupby(
-        ['File','Simulation'])[column_name].shift(shift_value)
+        ['file','simulation'])[column_name].shift(shift_value)
     return(df)
 
 def add_lag(df, lag_column_names, shift_values):
+
     for column_name in lag_column_names:
         for shift_value in shift_values:
             df = lag(df, column_name, shift_value)
     return(df)
 
-
 def add_crash_time(df):
-    df['TotalTimeToCrash'] = 0
-    for File in df['File'].unique():
-        for Simulation in df[df['File']==File]['Simulation'].unique():
-            time = df[(df['File']==File) &
-                      (df['Simulation']==Simulation)].shape[0] * df['Record Rate']
-            df.loc[(df['File']==File) &
-                   (df['Simulation']==Simulation),'TotalTimeToCrash'] = time
 
-    df['TimeToCrash'] = df['TotalTimeToCrash'] - df['Timestep']
+    df['total_time_to_crash'] = 0
+    for File in df['file'].unique():
+        for Simulation in df[df['file']==File]['simulation'].unique():
+            time = df[(df['file']==File) &
+                      (df['simulation']==Simulation)].shape[0] * df['record_rate']
+            df.loc[(df['file']==File) &
+                   (df['simulation']==Simulation),'total_time_to_crash'] = time
 
-    df.loc[dfcrash['Coral Success'] != -1, 'Time To Crash'] = -100
+    df['time_to_crash'] = df['time_to_crash'] - df['timestep']
+    df.loc[dfcrash['coral_success'] != -1, 'time_to_crash'] = -100
 
     return(df)
+
+
+
+
+
+
+'''
+
 
 # for new names including "threshold"
 
@@ -257,7 +259,7 @@ def viewRuns2(topDirectory):
     overviewOfRuns = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+', files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
 
     ## Assign column names + create file index
-    overviewOfRuns.columns = ['Rows', 'Columns', 'Grid Option', 'Grazing',
+    overviewOfRuns.number_of_columns = ['number_of_rows', 'number_of_columns', 'grid Option', 'Grazing',
                               'Initial Coral Percent', 'Initial Macroalgae Percent',
                               'r', 'd', 'a', 'y', 'Time', 'Record Rate',
                               'Number of Simulations', 'Threshold']
@@ -276,7 +278,7 @@ def viewImages2(topDirectory, overviewOfRuns):
     overviewOfImages = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',files[n])[1:-1], dtype='int')]) for n in range(0,len(files))])
 
     ## Assign column names + create file index
-    overviewOfImages.columns = ['Rows', 'Columns', 'Grid Option', 'Grazing', 'Simulation', 'Timestep','Initial Coral Percent', 'Initial Macroalgae Percent', 'r', 'd', 'a', 'y', 'Time', 'Record Rate', 'Number of Simulations','Threshold']
+    overviewOfImages.number_of_columns = ['number_of_rows', 'number_of_columns', 'Grid Option', 'Grazing', 'Simulation', 'Timestep','Initial Coral Percent', 'Initial Macroalgae Percent', 'r', 'd', 'a', 'y', 'Time', 'Record Rate', 'Number of Simulations','Threshold']
 
     overviewOfImages = overviewOfImages.set_index([pd.Series([n for n in range(0,len(files))])])
     overviewOfImages['ImageFile']=overviewOfImages.index
@@ -286,9 +288,24 @@ def viewImages2(topDirectory, overviewOfRuns):
     return(files, overviewOfImages)
 
 
+def scaled_by_number_of_nodes(df):
+
+    df['coral_patch_div_coral_count'] = df['CoralPatchCount']/df['CoralCount']
+    df['turf_patch_div_]';coral_count'] = df['TurfPatchCount']/df['TurfCount']
+    df['MacroPatchCount_Scaled'] = df['MacroPatchCount']/df['MacroalgaeCount']
+    df['AlgaePatchCount_Scaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount']+df['TurfCount'])
+    df['AlgaePatchCount_MScaled'] = df['AlgaePatchCount']/(df['MacroalgaeCount'])
+    df['AlgaePatchCount_TScaled'] = df['AlgaePatchCount']/(df['TurfCount'])
+
+    df['CoralNeighbors_Scaled'] = df['Coral-CoralNeighbors']/df['CoralCount']
+    df['TurfNeighbors_Scaled'] = df['Turf-TurfNeighbors']/df['TurfCount']
+    df['MacroNeighbors_Scaled'] = df['Macro-MacroNeighbors']/df['MacroalgaeCount']
+
+    return(df.replace(np.inf, 0))
 
 
-'''
+
+
 
 def genOut(grazesim):
     x = list(grazesim.simulation[1].coralNodeCount.keys())
@@ -485,10 +502,10 @@ def timeSeries(x, x1, x2, x3, legend1='Coral', legend2='Turf', legend3='Algae'):
 def finer(df, scale=3):
     columnCenter, rowCenter = 0, 0
     columnCount, rowCount = 0, 0
-    columns, rows = len(df[0]), len(df)
-    fine = np.zeros((rows*scale,columns*scale))
-    for r in range(0,rows*scale):
-        for c in range(0,columns*scale):
+    number_of_columns, number_of_rows = len(df[0]), len(df)
+    fine = np.zeros((number_of_rows*scale,number_of_columns*scale))
+    for r in range(0,number_of_rows*scale):
+        for c in range(0,number_of_columns*scale):
             fine[r,c] = df[rowCenter, columnCenter]
             columnCount += 1
             if columnCount == scale:
@@ -501,12 +518,12 @@ def finer(df, scale=3):
         columnCenter = 0
     return(fine)
 
-def tda_prep_fineness(df, rows, fineness=2, refined_grid=False):
+def tda_prep_fineness(df, number_of_rows, fineness=2, refined_grid=False):
     df = binary(df)
     dfi = 1-df
 
-    df = shaper(df,rows)
-    dfi = shaper(dfi,rows)
+    df = shaper(df,number_of_rows)
+    dfi = shaper(dfi,number_of_rows)
 
     if refined_grid == True:
         df = finer(df, scale = fineness)
@@ -556,10 +573,10 @@ def pullImageIndex(overviewOfImages, file, simulation, timestep):
                                       (overviewOfImages['Timestep']==timestep)]['ImageFile']
     return(int(imageFileIndex))
 
-def loadImage(imageFiles, overviewOfImages, file, simulation, timestep, nrows):
+def loadImage(imageFiles, overviewOfImages, file, simulation, timestep, nnumber_of_rows):
     index = pullImageIndex(overviewOfImages, file, simulation, timestep)
     image = np.genfromtxt(imageFiles[index])
-    return(shaper(image, nrows))
+    return(shaper(image, nnumber_of_rows))
 
 ## multiple images
 
@@ -569,11 +586,11 @@ def pullImageIndexes(overviewOfImages, file, simulation):
                                                             (overviewOfImages['Simulation']==simulation)]['ImageFile']]
     return(imageFileIndexes)
 
-def loadImages(imageFiles, overviewOfImages, file, simulation, nrows):
+def loadImages(imageFiles, overviewOfImages, file, simulation, nnumber_of_rows):
 
     indexes = pullImageIndexes(overviewOfImages, file, simulation)
     images = {int(overviewOfImages[overviewOfImages['ImageFile']==index]['Timestep']):
-              shaper(np.genfromtxt(imageFiles[index]),nrows) for index in indexes}
+              shaper(np.genfromtxt(imageFiles[index]),nnumber_of_rows) for index in indexes}
 
     return(images)
 

@@ -8,7 +8,7 @@ class Organism():
     def __init__(self, ID, type, location):
         self.ID = ID
         self.type = type
-        self.density = np.zeros(3)
+        self.neighbors = np.zeros(3)
         self.location = location
 
 class Reef():
@@ -34,15 +34,15 @@ class Reef():
         dy = a[1] - b[1]
         return math.sqrt(dx*dx + dy*dy)
 
-    def initiate_density(self):
+    def count_neighbor_types(self):
         for i,val in enumerate(self.nodes):
             for n in self.graph[i]:
                 if self.nodes[n].type == 0:
-                    self.nodes[i].density[0] += 1
+                    self.nodes[i].neighbors[0] += 1
                 elif self.nodes[n].type == 1:
-                    self.nodes[i].density[1] += 1
+                    self.nodes[i].neighbors[1] += 1
                 elif self.nodes[n].type == 2:
-                    self.nodes[i].density[2] += 1
+                    self.nodes[i].neighbors[2] += 1
 
     def generate_graph(self, threshold=1.5):
         self.graph = {self.nodes[i].ID:list(self.nodes[j].ID
@@ -54,7 +54,7 @@ class Reef():
                                                     self.nodes[j].location)
                                             < threshold)
                       for i,val in enumerate(self.nodes)}
-        self.initiate_density()
+        self.count_neighbor_types()
 
     def inform(self, initial, final, nodeID):
         for n in self.graph[nodeID]:
@@ -65,17 +65,17 @@ class Reef():
 
     def update(self):
         for key in self.updates:
-            self.nodes[key].density += self.updates[key]
+            self.nodes[key].neighbors += self.updates[key]
         self.updates = {}
 
     def roll(self, r, d, a, g, y, dt):
 
         for i, val in enumerate(self.nodes):
             U = random.uniform(0,1)
-            total_density = self.nodes[i].density.sum()
-            coral_density = self.nodes[i].density[0]/total_density
-            turf_density = self.nodes[i].density[1]/total_density
-            algae_density = self.nodes[i].density[2]/total_density
+            total_neighborhood_count = self.nodes[i].neighbors.sum()
+            coral_density = self.nodes[i].neighbors[0]/total_neighborhood_count
+            turf_density = self.nodes[i].neighbors[1]/total_neighborhood_count
+            algae_density = self.nodes[i].neighbors[2]/total_neighborhood_count
 
             if self.nodes[i].type == 0:
 
