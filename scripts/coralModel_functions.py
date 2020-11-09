@@ -15,7 +15,7 @@ number_of_simulations = int(sys.argv[2])
 
 coral_percent = float(sys.argv[3])/100
 macroalgae_percent = float(sys.argv[4])/100
-turf_percent = 1 - coral_percent - macroalgae_percent
+turf_percent = round(1 - coral_percent - macroalgae_percent, 2)
 
 grid_option = int(sys.argv[5])
 number_of_rows, number_of_columns = int(sys.argv[6]), int(sys.argv[7])
