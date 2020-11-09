@@ -39,8 +39,8 @@ def extract_neighbors(Moorea, node, count):
     if count == 0:
         neighbors = 0
     else:
-        neighbors = np.array([Moorea.nodes[n].density/
-                              Moorea.nodes[n].density.sum()
+        neighbors = np.array([Moorea.nodes[n].neighbors/
+                              Moorea.nodes[n].neighbors.sum()
                               for n,val in enumerate(Moorea.nodes)
                               if Moorea.nodes[n].type == node]).mean(axis=0)
     return(neighbors)
@@ -49,8 +49,8 @@ def extract_neighbors_specific(Moorea, node_type, neighbor_type, count):
     if Count == 0:
         neighbors = 0
     else:
-        neighbors = np.array([Moorea.nodes[n].density/
-                              Moorea.nodes[n].density.sum()
+        neighbors = np.array([Moorea.nodes[n].neighbors/
+                              Moorea.nodes[n].neighbors.sum()
                               for n,val in enumerate(Moorea.nodes)
                               if Moorea.nodes[n].type == node_type]).mean(axis=0)[neighbor_type]
     return(neighbors)
