@@ -120,7 +120,7 @@ def view_runs(top_directory):
                                 'number_of_timesteps', 'record_rate', 'number_of_simulations']
 
     overview_of_runs = overview_of_runs.set_index([pd.Series([n for n in range(0,len(files))])])
-    overview_of_runs['File']=overview_of_runs.index
+    overview_of_runs['file']=overview_of_runs.index
 
     return(files, overview_of_runs)
 
@@ -154,8 +154,8 @@ def load_runs(files, subset):
 
     #subset = needs to be a subset of viewRuns, output
     simulation_data = pd.concat([pd.DataFrame(pd.read_csv(
-        files[f])).assign(File = np.repeat(f, len(pd.read_csv(files[f])))) for f in list(subset.index)])
-    dataframe = pd.merge(simulation_data, subset, on='File')
+        files[f])).assign(file = np.repeat(f, len(pd.read_csv(files[f])))) for f in list(subset.index)])
+    dataframe = pd.merge(simulation_data, subset, on='file')
 
     return(dataframe)
 
@@ -228,15 +228,15 @@ def add_lag(df, lag_column_names, shift_values):
 def add_crash_time(df):
 
     df['total_time_to_crash'] = 0
-    for File in df['file'].unique():
-        for Simulation in df[df['file']==File]['simulation'].unique():
-            time = df[(df['file']==File) &
+    for file in df['file'].unique():
+        for Simulation in df[df['file']==file]['simulation'].unique():
+            time = df[(df['file']==file) &
                       (df['simulation']==Simulation)].shape[0] * df['record_rate']
-            df.loc[(df['file']==File) &
+            df.loc[(df['file']==file) &
                    (df['simulation']==Simulation),'total_time_to_crash'] = time
 
-    df['time_to_crash'] = df['time_to_crash'] - df['timestep']
-    df.loc[dfcrash['coral_success'] != -1, 'time_to_crash'] = -100
+    df['time_to_crash'] = df['total_time_to_crash'] - df['timestep']
+    df.loc[df['coral_success'] != -1, 'time_to_crash'] = -100
 
     return(df)
 
