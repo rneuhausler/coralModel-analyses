@@ -22,16 +22,15 @@ def generate_checker_board(number_of_rows, number_of_columns):
     return(checker_board)
 
 def generate_blob(blob_percent, blob_value, number_of_rows, number_of_columns, number_of_nodes):
-    not_blob = [a for a in [0,1,2] if a != blob_value]
     center = (number_of_rows/2, number_of_columns/2)
     distance_grid = np.array([Reef.distance([i+.5,j+.5], center)
                              for i in range(0,number_of_rows)
                              for j in range(0,number_of_columns)])
     max_distance = np.sort(distance_grid)[round(blob_percent * number_of_nodes)]
-    blob_locations = (np.where(distance_grid.reshape(number_of_rows, number_of_columns) < max_distance))
+    blob_locations = (np.where(distance_grid.reshape(number_of_rows, number_of_columns) <= max_distance))
     blob_locations = [(blob_locations[0][n],blob_locations[1][n])
-                     for n in range(0,len(blob_locations[0]))]
-    return(blob_locations, not_blob)
+                     for n in range(0,round(blob_percent * number_of_nodes))]
+    return(blob_locations)
 
 #Data Pulling
 
@@ -131,17 +130,15 @@ def view_images(top_directory, overview_of_runs):
              in f if file.endswith(".csv") and path.find('images') != -1]
 
     ## Pull parameter information from path + name
-    overview_of_images = pd.concat([pd.DataFrame([np.array(re.split('[a-z-/.]+',
+    overview_of_images = pd.concat([pd.DataFrame([np.array(re.split('[a-z-_/.]+',
                                                            files[n])[1:-1], dtype='int')])
                                                            for n in range(0,len(files))])
 
     ## Assign column names + create file index
-    overview_of_images.number_of_columns = ['number_of_rows', 'number_of_columns',
-                                            'grid_option', 'grazing',
-                                            'neighborhood_threshold', 'initial_coral_percent',
-                                            'initial_macroalgae_percent', 'r',
-                                            'd', 'a', 'y', 'number_of_timesteps',
-                                            'record_rate', 'number_of_simulations']
+    overview_of_images.columns = ['number_of_rows', 'number_of_columns', 'grid_option', 
+                                  'grazing', 'neighborhood_threshold', 'simulation', 
+                                  'timestep', 'initial_coral_percent', 'initial_macroalgae_percent', 'r',
+                                  'd', 'a', 'y', 'number_of_timesteps', 'record_rate', 'number_of_simulations']
 
     overview_of_images = overview_of_images.set_index([pd.Series([n for n in range(0,len(files))])])
     overview_of_images['image_file']=overview_of_images.index
@@ -149,6 +146,30 @@ def view_images(top_directory, overview_of_runs):
     overview_of_images = pd.merge(overview_of_images, overview_of_runs)
 
     return(files, overview_of_images)
+
+    
+## single images
+def pull_image_index(overview_of_images, file, simulation, timestep):
+    image_file_index = overview_of_images[(overview_of_images['file']==file)&
+                                          (overview_of_images['simulation']==simulation)&
+                                          (overview_of_images['timestep']==timestep)]['image_file']
+    return(int(image_file_index))
+def load_image(image_files, overview_of_images, file, simulation, timestep, nrows):
+    index = pull_image_index(overview_of_images, file, simulation, timestep)
+    image = np.genfromtxt(image_files[index])
+    return(shaper(image, nrows))
+
+
+## multiple images
+def pull_image_indexes(overview_of_images, file, simulation):
+    image_file_indexes = [index for index in overview_of_images[(overview_of_images['file']==file)&
+                                                                (overview_of_images['simulation']==simulation)]['image_file']]
+    return(image_file_indexes)
+def load_images(image_files, overview_of_images, file, simulation, nrows):
+    indexes = pull_image_indexes(overview_of_images, file, simulation)
+    images = {int(overview_of_images[overview_of_images['image_file']==index]['timestep']):
+              shaper(np.genfromtxt(image_files[index]),nrows) for index in indexes}
+    return(images)
 
 def load_runs(files, subset):
 

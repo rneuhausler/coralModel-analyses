@@ -6,16 +6,16 @@ do
 
     coralPercent=33
     macroalgaePercent=33
-    gridOption=0 #array
+    gridOption=2 #array
 
     #Time and Grid Settings
     rows=15
     columns=15
     neighborhoodThreshold=$THRESHOLD
 
-    recordRate=90
-    imageReturn=true
-    imageRecordRate=2000 ## after how many recordings do you want an image saved? 1 = each time the other recordings are taken
+    recordRate=10
+    imageReturn=true #lowercase spelling true or false
+    imageRecordRate=1 ## after how many recordings do you want an image saved? 1 = each time the other recordings are taken
 
         ## table for first run. later averages
     #loop through g, nested loop through gridoption (once ready)
@@ -25,7 +25,7 @@ do
     g=.53 #array
     y=.75
     dt=.1
-    tf=50 #can play with this value as well
+    tf=10 #can play with this value as well
 
     blobValue=0
 

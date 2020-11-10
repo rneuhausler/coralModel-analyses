@@ -4,7 +4,7 @@ numberOfSimulations=10
 
 coralPercent=33
 macroalgaePercent=33
-gridOption=0 #array
+gridOption=2 #array
 
 #Time and Grid Settings
 rows=15
