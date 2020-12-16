@@ -30,13 +30,22 @@ number_of_timesteps = int(tf/dt)
 number_of_recorded_timesteps = round(number_of_timesteps / record_rate)
 number_of_nodes = number_of_rows * number_of_columns
 
+if grid_option == 0:
+    grid = [(i,j) 
+            for i in range(0, number_of_columns) 
+            for j in range(0, number_of_rows)]
+    random.seed(simulation)
+    random.shuffle(grid)
+    coral_count = round(number_of_nodes*coral_percent)
+    macro_count = round(number_of_nodes*macroalgae_percent)
+    locations = {'coral': grid[0:coral_count],
+                 'macro': grid[coral_count: coral_count + macro_count]}
+
 if grid_option == 1:
     checker_board = tl.generate_checker_board(number_of_rows, number_of_columns)
 
 elif grid_option == 2:
-    
     type_percent_dictionary = {0:coral_percent, 1:turf_percent, 2:macroalgae_percent}
-    
     blob_value = int(sys.argv[19])
     blob_percent = type_percent_dictionary[blob_value]
     not_blob = [a for a in [0,1,2] if a != blob_value]
@@ -52,13 +61,19 @@ def create_reef():
     Moorea = Reef()
     count = 0
     for i in range(0, number_of_rows):
+        
         for j in range(0, number_of_columns):
 
-            if grid_option == 0:
-                U = np.random.choice([0,1,2],
-                                     p=[coral_percent,
-                                        turf_percent,
-                                        macroalgae_percent])
+            if grid_option == 0:  
+                if (i,j) in locations['coral']:
+                    U = 0
+                elif (i,j) in locations['macro']:
+                    U = 2
+                else:
+                    U = 1    
+            ## old random grid (issue: inconsistent initial percentages)    
+            #    U = np.random.choice([0,1,2],  p=[coral_percent, turf_percent, macroalgae_percent])
+            
             elif grid_option == 1:
                 U = checker_board[i,j]
 
@@ -86,7 +101,7 @@ def pull_info(Moorea, simulation, timestep, image_counter=image_counter):
     coral_patch_count, algae_patch_count, turf_patch_count, macroalgae_patch_count = tl.patch_counts(image, number_of_rows)
     data = [simulation, timestep, coral_count, turf_count, macroalgae_count,
             coral_neighbors, turf_neighbors, macroalgae_neighbors,
-            coral_patch_count, algae_patch_count, turf_patch_count, macroalgae_patch_count]
+            coral_patch_count, algae_patch_count, turf_patch_count, macroalgae_patch_count, image]
     dataframe = pd.DataFrame([data])
 
     if image_return == 'true':
@@ -131,6 +146,6 @@ if __name__ == '__main__':
 
     output.columns = ['simulation', 'timestep', 'coral_count', 'turf_count',
                       'macroalgae_count', 'coral_neighbors', 'turf_neighbors', 'macroalgae_neighbors',
-                      'coral_patch_count', 'algae_patch_count', 'turf_patch_count', 'macroalgae_patch_count']
+                      'coral_patch_count', 'algae_patch_count', 'turf_patch_count', 'macroalgae_patch_count', 'image']
 
     output.to_csv(path+name+'.csv', header=True, index=False)
