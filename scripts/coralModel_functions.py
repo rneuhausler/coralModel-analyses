@@ -32,11 +32,6 @@ number_of_timesteps = int(tf/dt)
 number_of_recorded_timesteps = round(number_of_timesteps / record_rate)
 number_of_nodes = number_of_rows * number_of_columns
 
-if grid_option == 0:
-    grid = [(i,j) 
-            for i in range(0, number_of_columns) 
-            for j in range(0, number_of_rows)]
-
 if grid_option == 1:
     checker_board = tl.generate_checker_board(number_of_rows, number_of_columns)
 
