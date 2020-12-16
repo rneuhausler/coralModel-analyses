@@ -7,6 +7,8 @@ import numpy as np
 import sys
 import pandas as pd
 from multiprocessing import Pool
+import random 
+
 
 ##  Parameters
 
@@ -34,12 +36,6 @@ if grid_option == 0:
     grid = [(i,j) 
             for i in range(0, number_of_columns) 
             for j in range(0, number_of_rows)]
-    random.seed(simulation)
-    random.shuffle(grid)
-    coral_count = round(number_of_nodes*coral_percent)
-    macro_count = round(number_of_nodes*macroalgae_percent)
-    locations = {'coral': grid[0:coral_count],
-                 'macro': grid[coral_count: coral_count + macro_count]}
 
 if grid_option == 1:
     checker_board = tl.generate_checker_board(number_of_rows, number_of_columns)
@@ -57,9 +53,23 @@ elif grid_option == 2:
                                       number_of_nodes)
 ##  Functions
 
-def create_reef():
+def create_reef(simulation):
+    
     Moorea = Reef()
     count = 0
+    
+    if grid_option == 0:
+        
+        random.seed(simulation)
+        grid = [(i,j)
+                for i in range(0, number_of_columns) 
+                for j in range(0, number_of_rows)]
+        random.shuffle(grid)
+        coral_count = round(number_of_nodes*coral_percent)
+        macro_count = round(number_of_nodes*macroalgae_percent)
+        locations = {'coral': grid[0:coral_count],
+                     'macro': grid[coral_count: coral_count + macro_count]}
+    
     for i in range(0, number_of_rows):
         
         for j in range(0, number_of_columns):
@@ -117,10 +127,10 @@ def pull_info(Moorea, simulation, timestep, image_counter=image_counter):
 def run_model(simulation):
 
     np.random.seed(simulation)
-
+    #random.seed(simulation)
     print('running simulation' + str(simulation))
 
-    Moorea = create_reef()
+    Moorea = create_reef(simulation)
     Moorea.generate_graph(neighborhood_threshold)
 
     for timestep in range(0, number_of_timesteps):
