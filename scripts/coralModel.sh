@@ -4,31 +4,31 @@ numberOfSimulations=10
 
 coralPercent=33
 macroalgaePercent=33
-gridOption=2 #array
+gridOption=0 #array
 
 #Time and Grid Settings
-rows=15
-columns=15
+rows=25
+columns=25
 neighborhoodThreshold=1.45
 
-recordRate=90
-imageReturn=true
-imageRecordRate=2000 ## after how many recordings do you want an image saved? 1 = each time the other recordings are taken
+recordRate=10
+imageReturn=false
+imageRecordRate=1 ## after how many recordings do you want an image saved? 1 = each time the other recordings are taken
 
     ## table for first run. later averages
 #loop through g, nested loop through gridoption (once ready)
 r=1.0
 d=.4
 a=.2
-g=.53 #array
+g=.57 #array
 y=.75
 dt=.1
-tf=50 #can play with this value as well
+tf=110 #can play with this value as well
 
 blobValue=0
 
 ## create directory
-grazingFolder=$(python -c "print(int($g*100))")
+grazingFolder=$(python -c "print(str($g).replace('.', ''))")
 thresholdFolder=$(python -c "print(int($neighborhoodThreshold*100))")
 
 

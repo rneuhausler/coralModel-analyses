@@ -7,7 +7,7 @@ import numpy as np
 import sys
 import pandas as pd
 from multiprocessing import Pool
-import random 
+import random
 
 
 ##  Parameters
@@ -40,7 +40,7 @@ elif grid_option == 2:
     blob_value = int(sys.argv[19])
     blob_percent = type_percent_dictionary[blob_value]
     not_blob = [a for a in [0,1,2] if a != blob_value]
-    not_blob_percentages_adjusted = [round(type_percent_dictionary[n]/ 
+    not_blob_percentages_adjusted = [round(type_percent_dictionary[n]/
                                            (1 - blob_percent), 2) for n in not_blob]
 
     blob_locations = tl.generate_blob(blob_percent, blob_value,
@@ -49,36 +49,35 @@ elif grid_option == 2:
 ##  Functions
 
 def create_reef(simulation):
-    
+
     Moorea = Reef()
     count = 0
-    
+
     if grid_option == 0:
-        
-        random.seed(simulation)
+
         grid = [(i,j)
-                for i in range(0, number_of_columns) 
+                for i in range(0, number_of_columns)
                 for j in range(0, number_of_rows)]
         random.shuffle(grid)
         coral_count = round(number_of_nodes*coral_percent)
         macro_count = round(number_of_nodes*macroalgae_percent)
         locations = {'coral': grid[0:coral_count],
                      'macro': grid[coral_count: coral_count + macro_count]}
-    
+
     for i in range(0, number_of_rows):
-        
+
         for j in range(0, number_of_columns):
 
-            if grid_option == 0:  
+            if grid_option == 0:
                 if (i,j) in locations['coral']:
                     U = 0
                 elif (i,j) in locations['macro']:
                     U = 2
                 else:
-                    U = 1    
-            ## old random grid (issue: inconsistent initial percentages)    
+                    U = 1
+            ## old random grid (issue: inconsistent initial percentages)
             #    U = np.random.choice([0,1,2],  p=[coral_percent, turf_percent, macroalgae_percent])
-            
+
             elif grid_option == 1:
                 U = checker_board[i,j]
 
@@ -86,7 +85,7 @@ def create_reef(simulation):
                 if (i,j) in blob_locations:
                     U = blob_value
                 else:
-                    U = np.random.choice(not_blob, 
+                    U = np.random.choice(not_blob,
                                          p=not_blob_percentages_adjusted)
             node = Organism(type=U, location=[i,j], ID=count)
             Moorea.append(node)
@@ -122,7 +121,7 @@ def pull_info(Moorea, simulation, timestep, image_counter=image_counter):
 def run_model(simulation):
 
     np.random.seed(simulation)
-    #random.seed(simulation)
+
     print('running simulation' + str(simulation))
 
     Moorea = create_reef(simulation)
@@ -142,7 +141,7 @@ def run_model(simulation):
 
 if __name__ == '__main__':
 
-    path='./output/'+str(number_of_rows)+'x'+str(number_of_columns)+'/grid'+str(grid_option)+'/grazing'+str(int(g*100))+'/threshold'+str(int(neighborhood_threshold*100))+'/'
+    path='./output/'+str(number_of_rows)+'x'+str(number_of_columns)+'/grid'+str(grid_option)+'/grazing'+str(g).replace('.', '')+'/threshold'+str(int(neighborhood_threshold*100))+'/'
 
     name='coral'+str(int(coral_percent*100))+'-macro'+str(int(macroalgae_percent*100))+'-r'+str(int(r*10))+'-d'+str(int(d*100))+'-a'+str(int(a*100))+'-y'+str(int(y*100))+'-time'+str(number_of_timesteps)+'-rec'+str(record_rate)+'-nsim'+str(number_of_simulations)
 
