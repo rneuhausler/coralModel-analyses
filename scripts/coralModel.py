@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import math
 
 
@@ -71,7 +70,7 @@ class Reef():
     def roll(self, r, d, a, g, y, dt):
 
         for i, val in enumerate(self.nodes):
-            U = random.uniform(0,1)
+            U = np.random.uniform(0,1)
             total_neighborhood_count = self.nodes[i].neighbors.sum()
             coral_density = self.nodes[i].neighbors[0]/total_neighborhood_count
             turf_density = self.nodes[i].neighbors[1]/total_neighborhood_count

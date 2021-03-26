@@ -7,7 +7,6 @@ import numpy as np
 import sys
 import pandas as pd
 from multiprocessing import Pool
-import random
 
 
 ##  Parameters
@@ -58,7 +57,7 @@ def create_reef(simulation):
         grid = [(i,j)
                 for i in range(0, number_of_columns)
                 for j in range(0, number_of_rows)]
-        random.shuffle(grid)
+        np.random.shuffle(grid)
         coral_count = round(number_of_nodes*coral_percent)
         macro_count = round(number_of_nodes*macroalgae_percent)
         locations = {'coral': grid[0:coral_count],
@@ -141,7 +140,7 @@ def run_model(simulation):
 
 if __name__ == '__main__':
 
-    path='./output/'+str(number_of_rows)+'x'+str(number_of_columns)+'/grid'+str(grid_option)+'/grazing'+str(g).replace('.', '')+'/threshold'+str(int(neighborhood_threshold*100))+'/'
+    path='./output/'+str(number_of_rows)+'x'+str(number_of_columns)+'/grid'+str(grid_option)+'/grazing'+str(round(g*100))+'/threshold'+str(int(neighborhood_threshold*100))+'/'
 
     name='coral'+str(int(coral_percent*100))+'-macro'+str(int(macroalgae_percent*100))+'-r'+str(int(r*10))+'-d'+str(int(d*100))+'-a'+str(int(a*100))+'-y'+str(int(y*100))+'-time'+str(number_of_timesteps)+'-rec'+str(record_rate)+'-nsim'+str(number_of_simulations)
 

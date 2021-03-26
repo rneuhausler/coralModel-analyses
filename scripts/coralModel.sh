@@ -28,7 +28,7 @@ tf=110 #can play with this value as well
 blobValue=0
 
 ## create directory
-grazingFolder=$(python -c "print(str($g).replace('.', ''))")
+grazingFolder=$(python -c "print(round($g*100))")
 thresholdFolder=$(python -c "print(int($neighborhoodThreshold*100))")
 
 
