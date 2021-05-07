@@ -20,7 +20,7 @@ imageRecordRate=1 ## after how many recordings do you want an image saved? 1 = e
 r=1.0
 d=.4
 a=.2
-g=.57 #array
+g=.58 #array
 y=.75
 dt=.1
 tf=110 #can play with this value as well
