@@ -29,9 +29,9 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 The model is agent-based, with each agent being assigned one of the benthic coverage types listed above. 
 Over time, an agent's type updates stochastically through probabilities determined by:
 1. Overall reef conditions defined through input parameters, and
-2. The node's immediate neighbors' types.
+2. The agent's immediate neighbors' types.
 
-Below is an example of an 15x15 node reef's composition initially and after 100 runs (updates) 
+Below is an example of an 15x15 agent reef's composition initially and after 100 runs (updates) 
 (0=Coral, 1=Turf, 2=Macroalgae):
 
 
@@ -44,11 +44,11 @@ We derived the rules for our model's dynamics from Mumby et al. (2007)'s reef co
 
 ![](images/mumbyEquations.png)
 
-From the equations above, we extract a set of 5 reactions that describe the probabilities of switching between the respective node types:
+From the equations above, we extract a set of 5 reactions that describe the probabilities of switching between the respective agent's types:
 
 ![](images/mumbyAdjusted.png)
 
-We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood composition and agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local fractional cover (based on neighborhood benthic compositions) instead of global (reef-wide). We implement this through the spatial explicitness of our model.
+We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood composition with the agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local fractional cover (based on neighborhood benthic compositions) instead of global (reef-wide). We implement this through the spatial explicitness of our model.
 
 Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism()` that become appended to an instance of the class `Reef()`. 
 
