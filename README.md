@@ -1,13 +1,15 @@
+# coralModel-TDA-study
 
-# coralModel
-
-## Authors:
-
-Rosanna Neuhausler and Maria Bruna
+This repository contains the code and overview of running coralModel to recreate the outputs for (our paper). 
+Please see [zigzagcoralmodel](https://github.com/rmcdomaths/zigzagcoralmodel) to compute the various TDA metrics on said outputs. 
 
 ## Acknowledgement
 
 This material is based upon work supported by the National Science Foundation under Grant No. DGE-1450053
+
+## Authors:
+
+Rosanna Neuhausler and Maria Bruna
 
 ----
 ----
@@ -26,7 +28,9 @@ coralModel is a stochastic spatiotemporal model representing the spatiotemporal 
 * Algal turf
 * Macroalgae
 
-The model is agent-based, with each agent being assigned one of the benthic coverage types listed above. 
+As it is based on a temporal model developed by Mumby, Hastings, and Edwards (MHE), we also refer to our spatial product as *s*MHE.
+
+*s*MHE is written utilizing python's object-oriented capabilities, with each object being assigned one of the benthic coverage types listed above. 
 Over time, an agent's type updates stochastically through probabilities determined by:
 1. Overall reef conditions defined through input parameters, and
 2. The agent's immediate neighbors' types.
