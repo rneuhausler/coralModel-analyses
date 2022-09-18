@@ -36,7 +36,7 @@ Updates are done stochastically through probabilities determined by:
 1. Overall reef conditions defined through parameters, and
 2. The neighborhood or each node.
 
-Below is an example of an 25x25 agent reef's composition initially and after 100 runs (updates) 
+Below is an example of a 25x25 node reef initially and after 100 runs (updates) 
 (0=Coral, 1=Turf, 2=Macroalgae):
 
 
@@ -53,7 +53,7 @@ From the equations above, we extract a set of 5 reactions that describe the prob
 
 ![](images/mumbyAdjusted.png)
 
-We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood composition with the agent-based approach. In our reactions above, we calculate `M`, `T`, `C` as local fractional cover (based on neighborhood benthic compositions) instead of global (reef-wide). We implement this through the spatial explicitness of our model.
+We are consistent with Mumby et al. in considering the parameters `r`, `d`, `a`, `g`, and `y`, to represent overall reef conditions, but deviate through our use of neighborhood composition. In our reactions above, we calculate `M`, `T`, `C` as local fractional cover (based on neighborhood benthic compositions) instead of global (reef-wide). We implement this through the spatial explicitness of our model.
 
 Our model is a product of object oriented programming; we abstract benthic coverages as instances of the class `Organism()` that become appended to an instance of the class `Reef()`. 
 
