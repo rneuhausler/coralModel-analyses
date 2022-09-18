@@ -40,7 +40,7 @@ Below is an example of a 25x25 node reef initially and after 100 runs (updates)
 (0=Coral, 1=Turf, 2=Macroalgae):
 
 
-![](images/exampleOutput/InitialFinal.png)
+![](images/spatial_evolution_images.png)
 
 
 ## Model Structure
