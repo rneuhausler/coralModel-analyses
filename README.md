@@ -1,7 +1,4 @@
-# coralModel-TDA-study
-
-This repository contains the code and overview of running coralModel to recreate the outputs for (our paper). 
-Please see [zigzagcoralmodel](https://github.com/rmcdomaths/zigzagcoralmodel) to compute the various TDA metrics on said outputs. 
+# coralModel-analyses
 
 ## Acknowledgement
 
